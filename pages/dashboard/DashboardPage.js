@@ -28,7 +28,9 @@ class DashboardPage {
     });
 
     // View Assets
-    this.viewAssets = page.locator("div.widgetLink");
+    this.viewAssets = page.getByText("View your Assets", {
+      exact: true,
+    });
 
     // User Details
     this.userName = page.getByText("Super Admin", {
@@ -84,11 +86,15 @@ class DashboardPage {
   }
 
   async verifyViewAssetLink() {
-    await expect(this.viewAssets).toBeVisible();
+    await expect(this.viewAssets).toBeVisible({
+      timeout: 5000,
+    });
   }
 
   async clickViewAssets() {
-    await expect(this.viewAssets).toBeVisible();
+    await expect(this.viewAssets).toBeVisible({
+      timeout: 5000,
+    });
 
     await this.viewAssets.click();
 
