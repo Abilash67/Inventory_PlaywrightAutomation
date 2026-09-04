@@ -6,3 +6,21 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+/allure-results/
+/screenshots/
+
+# Authentication and local configuration
+/auth/auth.json
+.env
+.env.*
+!.env.example
+
+# Coverage and logs
+coverage/
+*.log
+
+# Operating system and editor files
+.DS_Store
+Thumbs.db
+.vscode/

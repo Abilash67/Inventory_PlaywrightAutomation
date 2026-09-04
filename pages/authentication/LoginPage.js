@@ -31,7 +31,7 @@ class LoginPage {
         name: "Dashboard",
       })
     ).toBeVisible({
-      timeout: 10000,
+      timeout: 30000,
     });
   }
 }

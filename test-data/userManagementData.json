@@ -1,0 +1,14 @@
+{
+    "validUser": {
+        "name": "Amrutha S",
+        "employeeId": "TV0830",
+        "department": "Java",
+        "location": "Trivandrum"
+    },
+
+    "searchData": {
+        "validName": "Amrutha",
+        "validEmployeeId": "TV0830",
+        "invalidName": "INVALID_USER_999999"
+    }
+}

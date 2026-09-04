@@ -1,23 +1,16 @@
 const { test } = require("@playwright/test");
 
-const LoginPage = require("../../pages/authentication/LoginPage");
 const DashboardPage = require("../../pages/dashboard/DashboardPage");
-
-const loginData = require("../../test-data/loginData.json");
 
 const { captureScreenshot } = require("../../utils/screenshotUtils");
 
 test("Dashboard Verification", async ({ page }) => {
-  const login = new LoginPage(page);
   const dashboard = new DashboardPage(page);
 
-  // 1. Open Application
-  await login.openApplication();
+  // Open the protected dashboard with the shared authenticated state.
+  await page.goto("/");
 
-  // 2. Login
-  await login.login(loginData.email, loginData.password);
-
-  // 3. Verify Dashboard
+  // Verify Dashboard
   await dashboard.verifyDashboardLoaded();
 
   // 4. Verify User Details

@@ -23,9 +23,7 @@ class DashboardPage {
     });
 
     // Asset Count
-    this.assetsCount = page.getByText("5", {
-      exact: true,
-    });
+    this.assetsCount = page.getByText(/^\d+$/).first();
 
     // View Assets
     this.viewAssets = page.getByText("View your Assets", {

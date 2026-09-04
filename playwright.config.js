@@ -11,6 +11,8 @@ module.exports = defineConfig({
   use: {
     browserName: "chromium",
 
+    baseURL: "https://inventoryqa.techversantinfotech.com",
+
     headless: false,
 
     viewport: {
@@ -57,5 +59,24 @@ module.exports = defineConfig({
         resultsDir: "allure-results",
       },
     ],
+  ],
+
+  projects: [
+    {
+      name: 'setup',
+      testMatch: /auth\.setup\.js/
+    },
+    {
+      name: 'authenticated',
+      dependencies: ['setup'],
+      testIgnore: /tests[\\/]authentication[\\/]/,
+      use: {
+        storageState: 'auth/auth.json'
+      }
+    },
+    {
+      name: 'authentication',
+      testMatch: /tests[\\/]authentication[\\/].*\.spec\.js/
+    }
   ],
 });
