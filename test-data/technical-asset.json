@@ -1,0 +1,19 @@
+{
+    "validAsset": {
+        "assetType": "Desktop",
+        "location": "Kochi",
+        "status": "Available"
+    },
+
+    "anotherValidAsset": {
+        "assetType": "Mouse",
+        "location": "Trivandrum",
+        "status": "Available"
+    },
+
+    "invalidAsset": {
+        "assetType": "",
+        "location": "",
+        "status": ""
+    }
+}

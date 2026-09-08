@@ -1,0 +1,17 @@
+{
+  "technicalAssets": {
+    "assetType": [
+      "Laptop",
+      "Desktop",
+      "Monitor"
+    ],
+    "status": [
+      "Active",
+      "Inactive"
+    ],
+    "location": [
+      "Chennai",
+      "Bangalore"
+    ]
+  }
+}

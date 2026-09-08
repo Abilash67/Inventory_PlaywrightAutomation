@@ -1,36 +1,35 @@
 const { test } = require("@playwright/test");
 
+const LoginPage = require("../../pages/authentication/LoginPage");
 const DashboardPage = require("../../pages/dashboard/DashboardPage");
-
+const credentials = require("../../config/credentials");
 const { captureScreenshot } = require("../../utils/screenshotUtils");
 
 test("Dashboard Verification", async ({ page }) => {
+  const login = new LoginPage(page);
   const dashboard = new DashboardPage(page);
 
-  // Open the protected dashboard with the shared authenticated state.
-  await page.goto("/");
-
-  // Verify Dashboard
+  // Open the application and authenticate before verifying the dashboard.
+  await login.openApplication();
+  await login.login(credentials.email, credentials.password);
   await dashboard.verifyDashboardLoaded();
-
-  // 4. Verify User Details
-  await dashboard.verifyUser();
-
-  // 5. Verify Dashboard Cards
-  await dashboard.verifyCards();
-
-  // 6. Verify Asset Count
   await dashboard.verifyAssetCount();
-
-  // 7. Verify View Assets Link
-  await dashboard.verifyViewAssetLink();
-
-  // 8. Dashboard Screenshot
+  await dashboard.verifyRequestCount();
   await captureScreenshot(page, test.info(), "dashboard");
 
-  // 9. Navigate to Assets/Profile
-  await dashboard.clickViewAssets();
+  // 4. Verify Notification Count
+  await dashboard.verifyNotifications();
+  await captureScreenshot(page, test.info(), "notification-count");
 
-  // 10. Assets Page Screenshot
-  await captureScreenshot(page, test.info(), "assets-page");
+  // 5. Click View your Assets
+  await dashboard.clickViewAssets();
+  await captureScreenshot(page, test.info(), "view-your-assets");
+
+  // 6. Return to Dashboard and click View your Requests
+  await page.goBack();
+  await dashboard.verifyDashboardLoaded();
+  const requestPage = await dashboard.openViewRequests();
+  await captureScreenshot(requestPage, test.info(), "view-your-requests");
+  await page.goBack();
+  await dashboard.verifyDashboardLoaded();
 });

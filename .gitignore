@@ -24,3 +24,7 @@ coverage/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Local authentication and generated artifacts
+/README.md
+/dist/

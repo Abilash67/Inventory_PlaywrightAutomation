@@ -1,9 +1,15 @@
 {
   "name": "playwright",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {},
+  "description": "Playwright end-to-end automation for Inventory",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:authentication": "playwright test tests/authentication",
+    "test:inventory": "playwright test tests/inventory/technical-asset.spec.js",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen https://inventoryqa.techversantinfotech.com/login"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

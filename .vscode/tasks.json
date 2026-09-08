@@ -1,0 +1,159 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "load-inventory-spec",
+			"type": "shell",
+			"command": "cd /mnt/c/Users/abilash.m_techversan/Playwright && node -e \"require('./tests/inventory/inventory.spec.js'); console.log('loaded ok')\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "load-inventory-spec",
+			"type": "shell",
+			"command": "Set-Location 'c:\\Users\\abilash.m_techversan\\Playwright'; node -e \"require('./tests/inventory/inventory.spec.js'); console.log('loaded ok')\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "load-inventory-spec-2",
+			"type": "shell",
+			"command": "Set-Location 'c:\\Users\\abilash.m_techversan\\Playwright'; node -e \"require('./tests/inventory/inventory.spec.js'); console.log('loaded ok')\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "node-test-echo",
+			"type": "shell",
+			"command": "node -e 'console.log(\"hi\")'",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "node-arg-array",
+			"type": "shell",
+			"command": "$node = (Get-Command node).Source; & $node -e 'console.log(\"hi\")'",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "node-require-check",
+			"type": "shell",
+			"command": "Set-Location 'c:\\Users\\abilash.m_techversan\\Playwright'; node -p \"require('./tests/inventory/inventory.spec.js')\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run inventory Playwright test",
+			"type": "shell",
+			"command": "cd /mnt/c/Users/abilash.m_techversan/Playwright && npx playwright test tests/inventory/inventory.spec.js --project=chromium --reporter=line",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run inventory Playwright test",
+			"type": "shell",
+			"command": "cd \"C:\\Users\\abilash.m_techversan\\Playwright\"; npx playwright test tests/inventory/inventory.spec.js --project=chromium --reporter=line",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify inventory page exports",
+			"type": "shell",
+			"command": "cd /mnt/c/Users/abilash.m_techversan/Playwright && node - <<'NODE'\nconst spec = require('./tests/inventory/technical-assets.spec.js');\nconst pageFile = require('./pages/inventory/InventoryPage');\nconst aliasFile = require('./pages/inventory.page');\nconsole.log('spec ok');\nconsole.log(typeof pageFile.InventoryPage, typeof aliasFile.InventoryPage);\nNODE",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify inventory page exports",
+			"type": "shell",
+			"command": "cd /mnt/c/Users/abilash.m_techversan/Playwright; node -e \"const spec = require('./tests/inventory/technical-assets.spec.js'); const pageFile = require('./pages/inventory/InventoryPage'); const aliasFile = require('./pages/inventory.page'); console.log('spec ok'); console.log(typeof pageFile.InventoryPage, typeof aliasFile.InventoryPage);\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run authentication tests",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run authentication tests",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Repeat authentication stability run",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication --repeat-each=2 --workers=1",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify authentication stability",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication --repeat-each=2 --workers=1",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run parallel authentication tests",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run authentication login tests",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication/login.spec.js --project=authentication",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Rerun authentication login tests",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication/login.spec.js --project=authentication",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run authentication logout tests",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication/logout.spec.js --project=authentication",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Run full authentication suite",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Verify stable authentication suite",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Check authentication stability twice",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication --grep-invert \"uppercase, mixed-case|autofocuses email\" --repeat-each=2",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "Repeat stable authentication tests",
+			"type": "shell",
+			"command": "npx playwright test tests/authentication --project=authentication --grep-invert 'uppercase, mixed-case|autofocuses email' --repeat-each=2",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
