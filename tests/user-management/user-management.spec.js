@@ -17,10 +17,12 @@ test.describe('User Management - Complete Test Suite', () => {
     // =====================================================
 
     test.beforeEach(async ({ page }) => {
+
         userManagementPage =
             new UserManagementPage(page);
 
         await userManagementPage.goto();
+
     });
 
 
@@ -57,20 +59,23 @@ test.describe('User Management - Complete Test Suite', () => {
 
     test('TC03 - Verify user card displays required information', async () => {
 
-        const card =
-            userManagementPage.getUserCard(
-                userData.validUser.name
-            );
+        const userName =
+            userData.validUser.name;
 
+        const employeeId =
+            userData.validUser.employeeId;
+
+        const card =
+            userManagementPage.getUserCard(userName);
+
+        // Verify user card is visible
         await expect(card).toBeVisible();
 
-        await expect(card).toContainText(
-            userData.validUser.name
-        );
+        // Verify user name
+        await expect(card).toContainText(userName);
 
-        await expect(card).toContainText(
-            userData.validUser.employeeId
-        );
+        // Verify employee ID
+        await expect(card).toContainText(employeeId);
 
     });
 
@@ -478,7 +483,6 @@ test.describe('User Management - Complete Test Suite', () => {
                 });
 
             if (await cancelButton.count() > 0) {
-
                 await cancelButton.click();
             }
         }
@@ -627,7 +631,9 @@ test.describe('User Management - Complete Test Suite', () => {
                 userData.validUser.name
             );
 
-        expect(details.trim().length).toBeGreaterThan(0);
+        expect(
+            details.trim().length
+        ).toBeGreaterThan(0);
 
     });
 
