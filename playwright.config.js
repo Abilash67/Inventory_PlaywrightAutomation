@@ -29,21 +29,53 @@ module.exports = defineConfig({
   projects: [
     {
       name: "setup",
-      testMatch: /.*\.setup\.js/,
+      testMatch: /tests[\\/]authentication[\\/]auth\.setup\.js/,
     },
     {
-      name: "chromium",
+      name: "login",
+      testMatch: /tests[\\/]authentication[\\/]login\.spec\.js/,
+      dependencies: ["setup"],
+    },
+    {
+      name: "dashboard",
+      testMatch: /tests[\\/]dashboard[\\/].*\.spec\.js/,
       use: {
         ...devices["Desktop Chrome"],
-        browserName: "chromium",
         storageState: path.resolve(__dirname, "auth/auth.json"),
       },
-      dependencies: ["setup"],
-      testIgnore: /tests[\\/]authentication[\\/].*\.spec\.js/,
+      dependencies: ["login"],
     },
     {
-      name: "authentication",
-      testMatch: /tests[\\/]authentication[\\/].*\.spec\.js/,
+      name: "profile",
+      testMatch: /tests[\\/]profile[\\/].*\.spec\.js/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: path.resolve(__dirname, "auth/auth.json"),
+      },
+      dependencies: ["dashboard"],
+    },
+    {
+      name: "inventory",
+      testMatch: /tests[\\/]inventory[\\/].*\.spec\.js/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: path.resolve(__dirname, "auth/auth.json"),
+      },
+      dependencies: ["profile"],
+    },
+    {
+      name: "user-management",
+      testMatch: /tests[\\/]user-management[\\/].*\.spec\.js/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: path.resolve(__dirname, "auth/auth.json"),
+      },
+      dependencies: ["inventory"],
+    },
+    {
+      name: "logout",
+      testMatch: /tests[\\/]authentication[\\/]logout\.spec\.js/,
+      dependencies: ["user-management"],
     },
   ],
   reporter: [

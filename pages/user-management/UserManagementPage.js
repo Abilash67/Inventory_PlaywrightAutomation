@@ -1,3 +1,5 @@
+const { expect } = require('@playwright/test');
+
 class UserManagementPage {
 
     constructor(page) {
@@ -22,30 +24,12 @@ class UserManagementPage {
     }
 
     async goto() {
-        let navigationError;
-
-        for (let attempt = 0; attempt < 2; attempt++) {
-            try {
-                await this.page.goto('/users', {
-                    waitUntil: 'commit'
-                });
-                navigationError = undefined;
-                break;
-            } catch (error) {
-                navigationError = error;
-                await this.page.waitForTimeout(1000);
-            }
-        }
-
-        if (navigationError) {
-            throw navigationError;
-        }
-
-        await this.pageTitle.waitFor({
-            state: 'visible'
+        await this.page.goto('/users', {
+            waitUntil: 'domcontentloaded'
         });
-        await this.searchInput.waitFor({ state: 'visible' });
-        await this.waitForListUpdate();
+
+        await expect(this.pageTitle).toBeVisible();
+        await expect(this.searchInput).toBeVisible();
     }
 
     async searchUser(value) {
@@ -70,7 +54,7 @@ class UserManagementPage {
             exact: true
         });
 
-        return this.userCards.filter({ has: name }).first();
+        return name.locator('xpath=ancestor::*[.//button][1]');
     }
 
     async userExists(userName) {
@@ -107,6 +91,7 @@ class UserManagementPage {
 
     async hasCardAction(userName, action) {
         const card = this.getUserCard(userName);
+        await card.waitFor({ state: 'visible' });
         return await card.getByRole('button', { name: new RegExp(action, 'i') }).count() > 0;
     }
 

@@ -154,6 +154,33 @@
 			"command": "npx playwright test tests/authentication --project=authentication --grep-invert 'uppercase, mixed-case|autofocuses email' --repeat-each=2",
 			"isBackground": false,
 			"problemMatcher": []
+		},
+		{
+			"label": "cleanup allure and run requested tests",
+			"type": "shell",
+			"command": "cmd.exe /d /c \"node -e \\\"const fs=require('fs'); const p='allure-results'; if(!fs.existsSync(p)||!fs.statSync(p).isDirectory()) { console.error('ERROR: allure-results is not a directory'); process.exit(2); } console.log('allure-results: directory'); for(const e of fs.readdirSync(p)) fs.rmSync(require('path').join(p,e),{recursive:true,force:true}); if(fs.readdirSync(p).length!==0) { console.error('ERROR: allure-results not empty'); process.exit(3); } console.log('allure-results: empty after cleanup');\\\" && npx playwright test tests/authentication/login.spec.js tests/authentication/logout.spec.js tests/dashboard/dashboard.spec.js\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "cleanup allure and run tests",
+			"type": "shell",
+			"command": "node -e \"const fs=require('fs'),p='allure-results';if(!fs.existsSync(p)||!fs.statSync(p).isDirectory())process.exit(2);for(const e of fs.readdirSync(p))fs.rmSync(require('path').join(p,e),{recursive:true,force:true});if(fs.readdirSync(p).length)process.exit(3);console.log('allure-results directory verified and empty');\"",
+			"isBackground": false,
+			"problemMatcher": []
+		},
+		{
+			"label": "requested Playwright suites",
+			"type": "shell",
+			"command": "cmd.exe",
+			"args": [
+				"/d",
+				"/s",
+				"/c",
+				"\"node -e \\\"const fs=require('fs'); const p='allure-results'; if(!fs.existsSync(p)||!fs.statSync(p).isDirectory()) throw new Error('allure-results directory not found'); const entries=fs.readdirSync(p); for(const e of entries) fs.rmSync(require('path').join(p,e),{recursive:true,force:true}); if(fs.readdirSync(p).length) throw new Error('allure-results is not empty'); console.log('CLEANUP directory_preserved=true entries_before='+entries.length+' entries_after=0');\\\" && npx playwright test tests/authentication/login.spec.js tests/authentication/logout.spec.js tests/dashboard/dashboard.spec.js\""
+			],
+			"isBackground": false,
+			"problemMatcher": []
 		}
 	]
 }

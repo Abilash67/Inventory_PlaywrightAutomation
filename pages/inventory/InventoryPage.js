@@ -5,6 +5,8 @@ class InventoryPage {
 
     this.inventoryMenu = page.getByRole('link', { name: 'Inventory' });
     this.technicalAssets = page.getByRole('tab', { name: 'Technical Assets' });
+    this.softwareLicenses = page.getByRole('tab', { name: 'Software Licenses' });
+    this.infrastructureAssets = page.getByRole('tab', { name: 'Infrastructure Assets' });
   }
 
   async navigateToInventory() {
@@ -16,6 +18,14 @@ class InventoryPage {
   async openTechnicalAssets() {
     await this.technicalAssets.waitFor({ state: 'visible' });
     await this.technicalAssets.click();
+  }
+
+  async openSoftwareLicenses() {
+    await this.softwareLicenses.click();
+  }
+
+  async openInfrastructureAssets() {
+    await this.infrastructureAssets.click();
   }
 }
 

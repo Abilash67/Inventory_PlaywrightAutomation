@@ -89,4 +89,5 @@ test.describe("Logout", () => {
     await page.goto("/");
     await expect(page).toHaveURL(/\/login/);
   });
+
 });

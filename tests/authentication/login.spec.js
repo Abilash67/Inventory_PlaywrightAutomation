@@ -272,4 +272,5 @@ test.describe("Login", () => {
     await login.email.press("Tab");
     await expect(login.password).toBeFocused();
   });
+
 });

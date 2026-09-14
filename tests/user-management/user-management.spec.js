@@ -659,11 +659,13 @@ test.describe('User Management - Complete Test Suite', () => {
         const initialCount =
             await userManagementPage.getUserCount();
 
-        await page.reload();
-
-        await userManagementPage.pageTitle.waitFor({
-            state: 'visible'
+        await page.reload({
+            waitUntil: 'domcontentloaded'
         });
+
+        await expect(
+            userManagementPage.pageTitle
+        ).toBeVisible({ timeout: 30000 });
 
         const afterRefreshCount =
             await userManagementPage.getUserCount();
@@ -710,7 +712,6 @@ test.describe('User Management - Complete Test Suite', () => {
         ).toBeVisible();
 
     });
-
 
     // =====================================================
     // TC39 - LOCATION DROPDOWN
