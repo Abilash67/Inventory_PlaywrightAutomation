@@ -4,12 +4,10 @@ class DashboardPage {
   constructor(page) {
     this.page = page;
 
-    // Navigation
     this.dashboardMenu = page.getByRole("link", {
       name: "Dashboard",
     });
 
-    // Dashboard Cards
     this.assetsTitle = page.getByRole("heading", {
       name: "Your Assets",
     });
@@ -22,18 +20,20 @@ class DashboardPage {
       name: "Notifications",
     });
 
-    // Dashboard values and links
     this.assetsCount = page.locator("xpath=//div[@class='assetName']");
+
     this.viewAssets = page.locator(
       "xpath=//div[contains(text(),'View your Assets')]",
     );
+
     this.requestsCount = page.locator("xpath=//div[@class='requestItem']");
+
     this.viewRequests = page.locator(
       "xpath=//div[contains(text(),'View your Requests')]",
     );
+
     this.notifications = page.locator("xpath=//div[3]//div[1]//div[2]");
 
-    // User Details
     this.userName = page.getByText("Super Admin", {
       exact: true,
     });
@@ -42,12 +42,10 @@ class DashboardPage {
       exact: true,
     });
 
-    // Profile Menu
     this.profileMenu = page.getByRole("button").filter({
       has: page.locator("img[alt='profile']"),
     });
 
-    // Logout
     this.logoutButton = page.locator(
       "button.logoutButton.px-3.w-100.text-start",
     );
@@ -55,7 +53,9 @@ class DashboardPage {
     this.logoutConfirmationModal = page.locator(
       "div.alertModalBody.modal-body",
     );
+
     this.logoutDialog = page.getByRole("dialog");
+
     this.logoutConfirmation = this.logoutConfirmationModal.getByText(
       /are you sure you want to logout/i,
     );
@@ -63,13 +63,24 @@ class DashboardPage {
     this.confirmLogoutButton = this.logoutDialog.getByRole("button", {
       name: "Confirm",
     });
+
     this.cancelLogoutButton = this.logoutDialog.getByRole("button", {
       name: "Cancel",
     });
   }
 
   async verifyDashboardLoaded() {
-    await expect(this.dashboardMenu).toBeVisible();
+    await expect(this.assetsTitle).toBeVisible({
+      timeout: 10000,
+    });
+
+    await expect(this.requestTitle).toBeVisible({
+      timeout: 10000,
+    });
+
+    await expect(this.notificationTitle).toBeVisible({
+      timeout: 10000,
+    });
   }
 
   async verifyUser() {
@@ -135,6 +146,7 @@ class DashboardPage {
     await expect(this.page).toHaveURL(/\/support(?:\/)?$/, {
       timeout: 10000,
     });
+
     return this.page;
   }
 
@@ -158,6 +170,7 @@ class DashboardPage {
     await expect(this.logoutConfirmationModal).toBeVisible({
       timeout: 5000,
     });
+
     await expect(this.logoutConfirmation).toBeVisible({
       timeout: 5000,
     });
@@ -165,8 +178,11 @@ class DashboardPage {
 
   async cancelLogout() {
     await this.openLogoutConfirmation();
+
     await this.cancelLogoutButton.click();
+
     await expect(this.logoutConfirmationModal).toBeHidden();
+
     await this.verifyDashboardLoaded();
   }
 
@@ -175,9 +191,10 @@ class DashboardPage {
 
     await this.confirmLogoutButton.click();
 
-    await expect(this.page).toHaveURL(/\/login/, {
+    await expect(this.page).toHaveURL(/\/login(?:\/)?$/, {
       timeout: 10000,
     });
+
     await this.clearClientSession();
   }
 
@@ -186,6 +203,7 @@ class DashboardPage {
       localStorage.clear();
       sessionStorage.clear();
     });
+
     await this.page.context().clearCookies();
   }
 }

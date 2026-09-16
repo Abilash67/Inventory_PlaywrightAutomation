@@ -1,152 +1,209 @@
-const { expect } = require('@playwright/test');
+const { expect } = require("@playwright/test");
+const urls = require("../../constants/urls");
 
 class UserManagementPage {
+  constructor(page) {
+    this.page = page;
+    this.urls = urls;
 
-    constructor(page) {
-        this.page = page;
+    this.pageTitle = page
+      .getByText("User Management", {
+        exact: true,
+      })
+      .first();
 
-        this.pageTitle = page.getByRole('heading', {
-            name: 'User Management',
-            exact: true
-        });
-        this.searchInput = page.getByPlaceholder(/Search Users/i);
-        this.departmentDropdown = page.getByText('Select Department', { exact: true });
-        this.locationDropdown = page.getByText('Select Location', { exact: true });
-        this.userCards = page.locator('.userCard:visible');
-        this.viewButtons = page.getByRole('button', { name: /View/i });
-        this.editButtons = page.getByRole('button', { name: /Edit/i });
-        this.assetsButtons = page.getByRole('button', { name: /Assets/i });
-        this.deleteButtons = page.getByRole('button', { name: /Delete/i });
-    }
+    this.searchInput = page.getByPlaceholder("🔍 Search Users...");
 
-    async waitForListUpdate() {
-        await this.page.waitForTimeout(500);
-    }
+    this.departmentDropdown = page
+      .getByText("Select Department", {
+        exact: true,
+      })
+      .first();
 
-    async goto() {
-        await this.page.goto('/users', {
-            waitUntil: 'domcontentloaded'
-        });
+    this.locationDropdown = page
+      .getByText("Select Location", {
+        exact: true,
+      })
+      .first();
 
-        await expect(this.pageTitle).toBeVisible();
-        await expect(this.searchInput).toBeVisible();
-    }
+    this.userCards = page.locator(".userCard:visible");
 
-    async searchUser(value) {
-        await this.searchInput.waitFor({ state: 'visible' });
-        await this.searchInput.fill(value);
-        await this.waitForListUpdate();
-    }
+    this.viewButtons = page.getByRole("button", {
+      name: /View/i,
+    });
 
-    async clearSearch() {
-        await this.searchInput.fill('');
-        await this.waitForListUpdate();
-    }
+    this.editButtons = page.getByRole("button", {
+      name: /Edit/i,
+    });
 
-    async getUserCount() {
-        await this.waitForListUpdate();
-        return await this.viewButtons.count();
-    }
+    this.assetsButtons = page.getByRole("button", {
+      name: /Assets/i,
+    });
 
-    getUserCard(userName) {
-        const name = this.page.getByRole('heading', {
-            name: userName,
-            exact: true
-        });
+    this.deleteButtons = page.getByRole("button", {
+      name: /Delete/i,
+    });
+  }
 
-        return name.locator('xpath=ancestor::*[.//button][1]');
-    }
+  async waitForListUpdate() {
+    await this.page.waitForTimeout(500);
+  }
 
-    async userExists(userName) {
-        return await this.getUserCard(userName).count() > 0;
-    }
+  async goto() {
+    await this.page.goto(this.urls.userManagement, {
+      waitUntil: "commit",
+      timeout: 30000,
+    });
 
-    async getUserDetails(userName) {
-        const card = this.getUserCard(userName);
-        await card.waitFor({ state: 'visible' });
-        return await card.innerText();
-    }
+    await expect(this.page).toHaveURL(/\/users(?:\/)?$/, {
+      timeout: 30000,
+    });
 
-    async clickCardAction(userName, action) {
-        const card = this.getUserCard(userName);
-        await card.waitFor({ state: 'visible' });
-        await card.getByRole('button', { name: new RegExp(action, 'i') }).click();
-    }
+    await expect(this.searchInput).toBeVisible({
+      timeout: 30000,
+    });
+  }
 
-    async viewUser(userName) {
-        await this.clickCardAction(userName, 'View');
-    }
+  async searchUser(value) {
+    await this.searchInput.waitFor({ state: "visible" });
+    await this.searchInput.fill(value);
+    await this.waitForListUpdate();
+  }
 
-    async editUser(userName) {
-        await this.clickCardAction(userName, 'Edit');
-    }
+  async clearSearch() {
+    await this.searchInput.fill("");
+    await this.waitForListUpdate();
+  }
 
-    async viewAssets(userName) {
-        await this.clickCardAction(userName, 'Assets');
-    }
+  async getUserCount() {
+    await this.waitForListUpdate();
+    return await this.viewButtons.count();
+  }
 
-    async deleteUser(userName) {
-        await this.clickCardAction(userName, 'Delete');
-    }
+  getUserCard(userName) {
+    const name = this.page.getByRole("heading", {
+      name: userName,
+      exact: true,
+    });
 
-    async hasCardAction(userName, action) {
-        const card = this.getUserCard(userName);
-        await card.waitFor({ state: 'visible' });
-        return await card.getByRole('button', { name: new RegExp(action, 'i') }).count() > 0;
-    }
+    return name.locator("xpath=ancestor::*[.//button][1]");
+  }
 
-    async hasViewButton(userName) {
-        return await this.hasCardAction(userName, 'View');
-    }
+  async userExists(userName) {
+    return (await this.getUserCard(userName).count()) > 0;
+  }
 
-    async hasEditButton(userName) {
-        return await this.hasCardAction(userName, 'Edit');
-    }
+  async getUserDetails(userName) {
+    const card = this.getUserCard(userName);
 
-    async hasAssetsButton(userName) {
-        return await this.hasCardAction(userName, 'Assets');
-    }
+    await card.waitFor({ state: "visible" });
 
-    async hasDeleteButton(userName) {
-        return await this.hasCardAction(userName, 'Delete');
-    }
+    return await card.innerText();
+  }
 
+  async clickCardAction(userName, action) {
+    const card = this.getUserCard(userName);
 
-    async selectFilter(dropdown, value) {
-        await dropdown.click();
+    await card.waitFor({ state: "visible" });
 
-        await this.page.getByText(value, { exact: true }).last().click();
-        await this.waitForListUpdate();
-    }
+    await card
+      .getByRole("button", {
+        name: new RegExp(action, "i"),
+      })
+      .click();
+  }
 
-    async selectDepartment(department) {
-        await this.selectFilter(this.departmentDropdown, department);
-    }
+  async viewUser(userName) {
+    await this.clickCardAction(userName, "View");
+  }
 
-    async selectLocation(location) {
-        await this.selectFilter(this.locationDropdown, location);
-    }
+  async editUser(userName) {
+    await this.clickCardAction(userName, "Edit");
+  }
 
+  async viewAssets(userName) {
+    await this.clickCardAction(userName, "Assets");
+  }
 
-    async clearLocation() {
+  async deleteUser(userName) {
+    await this.clickCardAction(userName, "Delete");
+  }
 
-        await this.page.reload({ waitUntil: 'commit' });
-        await this.pageTitle.waitFor({ state: 'visible' });
-        await this.waitForListUpdate();
-    }
+  async hasCardAction(userName, action) {
+    const card = this.getUserCard(userName);
 
+    await card.waitFor({ state: "visible" });
 
-    // =====================================================
-    // CLEAR SEARCH
-    // =====================================================
+    return (
+      (await card
+        .getByRole("button", {
+          name: new RegExp(action, "i"),
+        })
+        .count()) > 0
+    );
+  }
 
-    async resetSearch() {
-        await this.searchInput.fill('');
-        await this.waitForListUpdate();
-    }
+  async hasViewButton(userName) {
+    return await this.hasCardAction(userName, "View");
+  }
+
+  async hasEditButton(userName) {
+    return await this.hasCardAction(userName, "Edit");
+  }
+
+  async hasAssetsButton(userName) {
+    return await this.hasCardAction(userName, "Assets");
+  }
+
+  async hasDeleteButton(userName) {
+    return await this.hasCardAction(userName, "Delete");
+  }
+
+  async selectFilter(dropdown, value) {
+    await dropdown.click();
+
+    await this.page
+      .getByText(value, {
+        exact: true,
+      })
+      .last()
+      .click();
+
+    await this.waitForListUpdate();
+  }
+
+  async selectDepartment(department) {
+    await this.selectFilter(this.departmentDropdown, department);
+  }
+
+  async selectLocation(location) {
+    await this.selectFilter(this.locationDropdown, location);
+  }
+
+  async clearLocation() {
+    await this.page.reload({
+      waitUntil: "commit",
+      timeout: 30000,
+    });
+
+    await expect(this.page).toHaveURL(/\/users(?:\/)?$/, {
+      timeout: 30000,
+    });
+
+    await expect(this.pageTitle).toBeVisible({
+      timeout: 30000,
+    });
+
+    await expect(this.searchInput).toBeVisible({
+      timeout: 30000,
+    });
+  }
+  async resetSearch() {
+    await this.searchInput.fill("");
+    await this.waitForListUpdate();
+  }
 }
 
-
 module.exports = {
-    UserManagementPage
+  UserManagementPage,
 };

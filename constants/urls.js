@@ -7,4 +7,5 @@ module.exports = {
   login: `${baseURL}/login`,
   dashboard: `${baseURL}/`,
   inventory: `${baseURL}/inventory`,
+  userManagement: `${baseURL}/users`,
 };

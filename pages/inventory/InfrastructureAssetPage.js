@@ -16,13 +16,20 @@ class InfrastructureAssetPage {
   dialog() { return this.page.getByRole('dialog'); }
 
   async verifyTable() {
-    await expect(this.infrastructureTab).toBeVisible();
-    await expect(this.assetTable).toBeVisible();
-    for (const header of ['Asset Code', 'Asset Type', 'Location', 'Status', 'Actions']) {
-      await expect(this.assetTable.getByRole('columnheader', { name: new RegExp(header) })).toBeVisible();
-    }
-    await expect(this.rows().first()).toBeVisible();
+  await expect(this.infrastructureTab).toBeVisible();
+
+  await expect(this.assetTable).toBeVisible({ timeout: 15000 });
+
+  for (const header of ['Asset Code', 'Asset Type', 'Location', 'Status', 'Actions']) {
+    await expect(
+      this.assetTable.getByRole('columnheader', {
+        name: new RegExp(header),
+      })
+    ).toBeVisible();
   }
+
+  await expect(this.rows().first()).toBeVisible();
+}
 
   async selectRowsPerPage(value) { await this.rowsPerPage.selectOption(String(value)); }
   async viewFirstAsset() { await this.rows().first().getByRole('button', { name: 'View' }).click(); }

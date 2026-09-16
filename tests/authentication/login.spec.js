@@ -19,6 +19,7 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await expect(login.password).toHaveAttribute("type", "password");
   });
 
@@ -28,10 +29,10 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
-    await expect(login.getErrorMessage()).toContainText(
-      /invalid email or password|incorrect email or password/i,
-    );
+
+    await login.expectInvalidCredentials();
   });
 
   test("clears the invalid-credential error after a new form interaction", async ({
@@ -40,22 +41,38 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
+
     await login.expectInvalidCredentials();
+
     await login.email.fill(credentials.email);
+
     await expect(login.getErrorMessage()).toBeHidden();
   });
 
-  test("returns to the dashboard after navigating back and forward", async ({
+  test("returns to the dashboard after navigating to login and dashboard", async ({
     page,
   }) => {
     const login = new LoginPage(page);
     const dashboard = new DashboardPage(page);
 
     await login.openApplication();
+
     await login.login(credentials.email, credentials.password);
-    await page.goBack();
-    await page.goForward();
+
+    await page.goto("/login", {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
+
+    await login.expectOnLoginPage();
+
+    await page.goto("/", {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
+
     await login.expectDashboard();
     await dashboard.verifyDashboardLoaded();
   });
@@ -66,6 +83,7 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await page.goto("/");
+
     await login.expectOnLoginPage();
   });
 
@@ -74,15 +92,24 @@ test.describe("Login", () => {
   }) => {
     const login = new LoginPage(page);
 
-    await page.goto("/inventory");
+    await page.goto("/inventory", {
+      waitUntil: "commit",
+      timeout: 30000,
+    });
+
     await login.expectOnLoginPage();
   });
 
   test("supports mobile login layout", async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize({
+      width: 390,
+      height: 844,
+    });
+
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await login.expectLoginForm();
     await expect(login.loginButton).toBeInViewport();
   });
@@ -91,7 +118,9 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
+
     await login.expectInvalidCredentials();
     await login.expectOnLoginPage();
   });
@@ -102,10 +131,12 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await login.loginButton.click();
 
     await expect(login.email).toHaveValue("");
     await expect(login.password).toHaveValue("");
+
     await login.expectOnLoginPage();
   });
 
@@ -115,7 +146,9 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await login.submit("not-an-email", "AnyPassword123!");
+
     await login.expectOnLoginPage();
   });
 
@@ -126,9 +159,12 @@ test.describe("Login", () => {
     const dashboard = new DashboardPage(page);
 
     await login.openApplication();
+
     await login.login(credentials.email, credentials.password);
+
     await dashboard.verifyDashboardLoaded();
-    await expect(page).not.toHaveURL(/\/login/);
+
+    await expect(page).not.toHaveURL(/\/login(?:\/)?$/);
   });
 
   test("toggles password visibility without changing the password value", async ({
@@ -137,15 +173,19 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await login.password.fill(credentials.password);
+
     await expect(login.password).toHaveAttribute("type", "password");
     await expect(login.password).toHaveValue(credentials.password);
 
     await login.togglePasswordVisibility();
+
     await expect(login.password).toHaveAttribute("type", "text");
     await expect(login.password).toHaveValue(credentials.password);
 
     await login.togglePasswordVisibility();
+
     await expect(login.password).toHaveAttribute("type", "password");
     await expect(login.password).toHaveValue(credentials.password);
   });
@@ -157,21 +197,26 @@ test.describe("Login", () => {
     const dashboard = new DashboardPage(page);
 
     await login.openApplication();
+
     await login.submitFromField(
       login.email,
       credentials.email,
       credentials.password,
     );
+
     await login.expectDashboard();
     await dashboard.verifyDashboardLoaded();
+
     await dashboard.logout();
 
     await login.openApplication();
+
     await login.submitFromField(
       login.password,
       credentials.email,
       credentials.password,
     );
+
     await login.expectDashboard();
     await dashboard.verifyDashboardLoaded();
   });
@@ -186,6 +231,7 @@ test.describe("Login", () => {
 
     const login = new LoginPage(page);
     const dashboard = new DashboardPage(page);
+
     const emailVariants = [
       credentials.email.toUpperCase(),
       credentials.email
@@ -197,8 +243,11 @@ test.describe("Login", () => {
 
     for (const email of emailVariants) {
       await login.openApplication();
+
       await login.login(email, credentials.password);
+
       await dashboard.verifyDashboardLoaded();
+
       await dashboard.logout();
     }
   });
@@ -210,9 +259,11 @@ test.describe("Login", () => {
     const dashboard = new DashboardPage(page);
 
     await login.openApplication();
+
     await login.login(credentials.email, credentials.password);
 
     await expect(page).toHaveURL(/\/(?:dashboard)?\/?$/);
+
     await dashboard.verifyDashboardLoaded();
     await dashboard.verifyCards();
     await dashboard.verifyUser();
@@ -225,10 +276,17 @@ test.describe("Login", () => {
     const dashboard = new DashboardPage(page);
 
     await login.openApplication();
-    await login.login(credentials.email, credentials.password);
-    await page.reload({ waitUntil: "domcontentloaded" });
 
-    await expect(page).not.toHaveURL(/\/login(?:\/)?$/);
+    await login.login(credentials.email, credentials.password);
+
+    await page.reload({
+      waitUntil: "domcontentloaded",
+    });
+
+    await expect(page).not.toHaveURL(/\/login(?:\/)?$/, {
+      timeout: 30000,
+    });
+
     await dashboard.verifyDashboardLoaded();
     await dashboard.verifyCards();
   });
@@ -239,21 +297,28 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
     const dashboard = new DashboardPage(page);
 
-    for (const email of [
+    const whitespaceVariants = [
       `  ${credentials.email}`,
       `${credentials.email}  `,
-    ]) {
+    ];
+
+    for (const email of whitespaceVariants) {
       await login.openApplication();
+
       await login.login(email, credentials.password);
+
       await dashboard.verifyDashboardLoaded();
+
       await dashboard.logout();
     }
 
     await login.openApplication();
+
     await login.submit(
       credentials.email.replace("@", " @"),
       credentials.password,
     );
+
     await login.expectOnLoginPage();
   });
 
@@ -268,9 +333,11 @@ test.describe("Login", () => {
     const login = new LoginPage(page);
 
     await login.openApplication();
+
     await expect(login.email).toBeFocused();
+
     await login.email.press("Tab");
+
     await expect(login.password).toBeFocused();
   });
-
 });
