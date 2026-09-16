@@ -47,7 +47,12 @@ function () {
     this.bulkUploadMenuItem = this.page.getByRole("button", {
       name: "Bulk Upload Assets",
       exact: true
+    }); // Pagination controls
+
+    this.pageButtons = this.technicalTab.getByRole("button", {
+      name: /^\d+$/
     });
+    this.rowsPerPageSelect = this.technicalTab.locator("select").last();
   }
 
   _createClass(TechnicalAssetPage, [{
@@ -119,45 +124,34 @@ function () {
       }, null, this);
     }
   }, {
-    key: "selectFilterOption",
-    value: function selectFilterOption(filter, option) {
-      var filterContainer, checkbox;
-      return regeneratorRuntime.async(function selectFilterOption$(_context5) {
+    key: "goToPage",
+    value: function goToPage(pageNumber) {
+      return regeneratorRuntime.async(function goToPage$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
               _context5.next = 2;
-              return regeneratorRuntime.awrap(filter.click());
+              return regeneratorRuntime.awrap(this.technicalTab.getByRole("button", {
+                name: String(pageNumber),
+                exact: true
+              }).click());
 
             case 2:
-              filterContainer = filter.locator("..");
-              checkbox = filterContainer.getByRole("checkbox", {
-                name: option,
-                exact: true
-              });
-              _context5.next = 6;
-              return regeneratorRuntime.awrap(checkbox.check());
-
-            case 6:
-              _context5.next = 8;
-              return regeneratorRuntime.awrap(expect(checkbox).toBeChecked());
-
-            case 8:
             case "end":
               return _context5.stop();
           }
         }
-      });
+      }, null, this);
     }
   }, {
-    key: "filterByAssetType",
-    value: function filterByAssetType(assetType) {
-      return regeneratorRuntime.async(function filterByAssetType$(_context6) {
+    key: "selectRowsPerPage",
+    value: function selectRowsPerPage(value) {
+      return regeneratorRuntime.async(function selectRowsPerPage$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
               _context6.next = 2;
-              return regeneratorRuntime.awrap(this.selectFilterOption(this.assetTypeFilter, assetType));
+              return regeneratorRuntime.awrap(this.rowsPerPageSelect.selectOption(String(value)));
 
             case 2:
             case "end":
@@ -167,31 +161,45 @@ function () {
       }, null, this);
     }
   }, {
-    key: "filterByStatus",
-    value: function filterByStatus(status) {
-      return regeneratorRuntime.async(function filterByStatus$(_context7) {
+    key: "selectFilterOption",
+    value: function selectFilterOption(filter, option) {
+      var filterContainer, checkbox;
+      return regeneratorRuntime.async(function selectFilterOption$(_context7) {
         while (1) {
           switch (_context7.prev = _context7.next) {
             case 0:
               _context7.next = 2;
-              return regeneratorRuntime.awrap(this.selectFilterOption(this.statusFilter, status));
+              return regeneratorRuntime.awrap(filter.click());
 
             case 2:
+              filterContainer = filter.locator("..");
+              checkbox = filterContainer.getByRole("checkbox", {
+                name: option,
+                exact: true
+              });
+              _context7.next = 6;
+              return regeneratorRuntime.awrap(checkbox.check());
+
+            case 6:
+              _context7.next = 8;
+              return regeneratorRuntime.awrap(expect(checkbox).toBeChecked());
+
+            case 8:
             case "end":
               return _context7.stop();
           }
         }
-      }, null, this);
+      });
     }
   }, {
-    key: "filterByLocation",
-    value: function filterByLocation(location) {
-      return regeneratorRuntime.async(function filterByLocation$(_context8) {
+    key: "filterByAssetType",
+    value: function filterByAssetType(assetType) {
+      return regeneratorRuntime.async(function filterByAssetType$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
               _context8.next = 2;
-              return regeneratorRuntime.awrap(this.selectFilterOption(this.locationFilter, location));
+              return regeneratorRuntime.awrap(this.selectFilterOption(this.assetTypeFilter, assetType));
 
             case 2:
             case "end":
@@ -201,24 +209,16 @@ function () {
       }, null, this);
     }
   }, {
-    key: "openAddAssetForm",
-    value: function openAddAssetForm() {
-      return regeneratorRuntime.async(function openAddAssetForm$(_context9) {
+    key: "filterByStatus",
+    value: function filterByStatus(status) {
+      return regeneratorRuntime.async(function filterByStatus$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
             case 0:
               _context9.next = 2;
-              return regeneratorRuntime.awrap(this.addAssetToggle.click());
+              return regeneratorRuntime.awrap(this.selectFilterOption(this.statusFilter, status));
 
             case 2:
-              _context9.next = 4;
-              return regeneratorRuntime.awrap(this.addAssetMenuItem.click());
-
-            case 4:
-              _context9.next = 6;
-              return regeneratorRuntime.awrap(expect(this.page.getByRole("dialog")).toContainText("Add New Asset"));
-
-            case 6:
             case "end":
               return _context9.stop();
           }
@@ -226,26 +226,68 @@ function () {
       }, null, this);
     }
   }, {
-    key: "openBulkUploadForm",
-    value: function openBulkUploadForm() {
-      return regeneratorRuntime.async(function openBulkUploadForm$(_context10) {
+    key: "filterByLocation",
+    value: function filterByLocation(location) {
+      return regeneratorRuntime.async(function filterByLocation$(_context10) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
               _context10.next = 2;
+              return regeneratorRuntime.awrap(this.selectFilterOption(this.locationFilter, location));
+
+            case 2:
+            case "end":
+              return _context10.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "openAddAssetForm",
+    value: function openAddAssetForm() {
+      return regeneratorRuntime.async(function openAddAssetForm$(_context11) {
+        while (1) {
+          switch (_context11.prev = _context11.next) {
+            case 0:
+              _context11.next = 2;
               return regeneratorRuntime.awrap(this.addAssetToggle.click());
 
             case 2:
-              _context10.next = 4;
+              _context11.next = 4;
+              return regeneratorRuntime.awrap(this.addAssetMenuItem.click());
+
+            case 4:
+              _context11.next = 6;
+              return regeneratorRuntime.awrap(expect(this.page.getByRole("dialog")).toContainText("Add New Asset"));
+
+            case 6:
+            case "end":
+              return _context11.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "openBulkUploadForm",
+    value: function openBulkUploadForm() {
+      return regeneratorRuntime.async(function openBulkUploadForm$(_context12) {
+        while (1) {
+          switch (_context12.prev = _context12.next) {
+            case 0:
+              _context12.next = 2;
+              return regeneratorRuntime.awrap(this.addAssetToggle.click());
+
+            case 2:
+              _context12.next = 4;
               return regeneratorRuntime.awrap(this.bulkUploadMenuItem.click());
 
             case 4:
-              _context10.next = 6;
+              _context12.next = 6;
               return regeneratorRuntime.awrap(expect(this.page.getByRole("dialog")).toContainText("Bulk Upload Assets"));
 
             case 6:
             case "end":
-              return _context10.stop();
+              return _context12.stop();
           }
         }
       }, null, this);
@@ -267,68 +309,68 @@ function () {
           _ref$edit,
           edit,
           expectedTitle,
-          _args11 = arguments;
+          _args13 = arguments;
 
-      return regeneratorRuntime.async(function verifyAssetFormFields$(_context11) {
+      return regeneratorRuntime.async(function verifyAssetFormFields$(_context13) {
         while (1) {
-          switch (_context11.prev = _context11.next) {
+          switch (_context13.prev = _context13.next) {
             case 0:
-              _ref = _args11.length > 0 && _args11[0] !== undefined ? _args11[0] : {}, _ref$edit = _ref.edit, edit = _ref$edit === void 0 ? false : _ref$edit;
+              _ref = _args13.length > 0 && _args13[0] !== undefined ? _args13[0] : {}, _ref$edit = _ref.edit, edit = _ref$edit === void 0 ? false : _ref$edit;
               expectedTitle = edit ? "Edit Asset" : "Add New Asset";
-              _context11.next = 4;
+              _context13.next = 4;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText(expectedTitle));
 
             case 4:
-              _context11.next = 6;
+              _context13.next = 6;
               return regeneratorRuntime.awrap(expect(this.formSelect(0)).toBeVisible());
 
             case 6:
-              _context11.next = 8;
+              _context13.next = 8;
               return regeneratorRuntime.awrap(expect(this.dialog().getByPlaceholder("Auto-generated")).toBeVisible());
 
             case 8:
-              _context11.next = 10;
+              _context13.next = 10;
               return regeneratorRuntime.awrap(expect(this.dialog().getByPlaceholder("Enter Model Name")).toBeVisible());
 
             case 10:
-              _context11.next = 12;
+              _context13.next = 12;
               return regeneratorRuntime.awrap(expect(this.dialog().getByPlaceholder("Enter Storage")).toBeVisible());
 
             case 12:
-              _context11.next = 14;
+              _context13.next = 14;
               return regeneratorRuntime.awrap(expect(this.dialog().getByPlaceholder("Enter OS")).toBeVisible());
 
             case 14:
-              _context11.next = 16;
+              _context13.next = 16;
               return regeneratorRuntime.awrap(expect(this.dialog().getByPlaceholder("Enter RAM size")).toBeVisible());
 
             case 16:
-              _context11.next = 18;
+              _context13.next = 18;
               return regeneratorRuntime.awrap(expect(this.dialog().getByPlaceholder("Enter Processor Details")).toBeVisible());
 
             case 18:
-              _context11.next = 20;
+              _context13.next = 20;
               return regeneratorRuntime.awrap(expect(this.dialog().getByPlaceholder("Enter Purchase Amount")).toBeVisible());
 
             case 20:
-              _context11.next = 22;
+              _context13.next = 22;
               return regeneratorRuntime.awrap(expect(this.dialog().locator('input[type="date"]')).toBeVisible());
 
             case 22:
-              _context11.next = 24;
+              _context13.next = 24;
               return regeneratorRuntime.awrap(expect(this.formSelect(1)).toBeVisible());
 
             case 24:
-              _context11.next = 26;
+              _context13.next = 26;
               return regeneratorRuntime.awrap(expect(this.formSelect(2)).toBeVisible());
 
             case 26:
-              _context11.next = 28;
+              _context13.next = 28;
               return regeneratorRuntime.awrap(expect(this.dialog().getByPlaceholder("Additional notes about the asset")).toBeVisible());
 
             case 28:
             case "end":
-              return _context11.stop();
+              return _context13.stop();
           }
         }
       }, null, this);
@@ -336,18 +378,18 @@ function () {
   }, {
     key: "cancelDialog",
     value: function cancelDialog() {
-      return regeneratorRuntime.async(function cancelDialog$(_context12) {
+      return regeneratorRuntime.async(function cancelDialog$(_context14) {
         while (1) {
-          switch (_context12.prev = _context12.next) {
+          switch (_context14.prev = _context14.next) {
             case 0:
-              _context12.next = 2;
+              _context14.next = 2;
               return regeneratorRuntime.awrap(this.dialog().getByRole("button", {
                 name: "Cancel"
               }).click());
 
             case 2:
             case "end":
-              return _context12.stop();
+              return _context14.stop();
           }
         }
       }, null, this);
@@ -356,28 +398,28 @@ function () {
     key: "downloadBulkUploadTemplate",
     value: function downloadBulkUploadTemplate() {
       var downloadLink, href;
-      return regeneratorRuntime.async(function downloadBulkUploadTemplate$(_context13) {
+      return regeneratorRuntime.async(function downloadBulkUploadTemplate$(_context15) {
         while (1) {
-          switch (_context13.prev = _context13.next) {
+          switch (_context15.prev = _context15.next) {
             case 0:
               downloadLink = this.dialog().getByRole("link", {
                 name: /Download Sample Template/
               });
-              _context13.next = 3;
+              _context15.next = 3;
               return regeneratorRuntime.awrap(expect(downloadLink).toBeVisible());
 
             case 3:
-              _context13.next = 5;
+              _context15.next = 5;
               return regeneratorRuntime.awrap(downloadLink.getAttribute("href"));
 
             case 5:
-              href = _context13.sent;
+              href = _context15.sent;
               expect(href).toBe("/assets/addAssets.xlsx");
-              return _context13.abrupt("return", href);
+              return _context15.abrupt("return", href);
 
             case 8:
             case "end":
-              return _context13.stop();
+              return _context15.stop();
           }
         }
       }, null, this);
@@ -385,22 +427,22 @@ function () {
   }, {
     key: "chooseBulkUploadFile",
     value: function chooseBulkUploadFile(filePath) {
-      return regeneratorRuntime.async(function chooseBulkUploadFile$(_context14) {
+      return regeneratorRuntime.async(function chooseBulkUploadFile$(_context16) {
         while (1) {
-          switch (_context14.prev = _context14.next) {
+          switch (_context16.prev = _context16.next) {
             case 0:
-              _context14.next = 2;
+              _context16.next = 2;
               return regeneratorRuntime.awrap(this.dialog().locator('input[type="file"]').setInputFiles(filePath));
 
             case 2:
-              _context14.next = 4;
+              _context16.next = 4;
               return regeneratorRuntime.awrap(expect(this.dialog().getByRole("button", {
                 name: "Upload"
               })).toBeEnabled());
 
             case 4:
             case "end":
-              return _context14.stop();
+              return _context16.stop();
           }
         }
       }, null, this);
@@ -420,51 +462,13 @@ function () {
   }, {
     key: "viewAsset",
     value: function viewAsset(assetCode) {
-      return regeneratorRuntime.async(function viewAsset$(_context15) {
-        while (1) {
-          switch (_context15.prev = _context15.next) {
-            case 0:
-              _context15.next = 2;
-              return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
-                name: "View"
-              }).click());
-
-            case 2:
-            case "end":
-              return _context15.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "editAsset",
-    value: function editAsset(assetCode) {
-      return regeneratorRuntime.async(function editAsset$(_context16) {
-        while (1) {
-          switch (_context16.prev = _context16.next) {
-            case 0:
-              _context16.next = 2;
-              return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
-                name: "Edit"
-              }).click());
-
-            case 2:
-            case "end":
-              return _context16.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "viewAssetHistory",
-    value: function viewAssetHistory(assetCode) {
-      return regeneratorRuntime.async(function viewAssetHistory$(_context17) {
+      return regeneratorRuntime.async(function viewAsset$(_context17) {
         while (1) {
           switch (_context17.prev = _context17.next) {
             case 0:
               _context17.next = 2;
               return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
-                name: "History"
+                name: "View"
               }).click());
 
             case 2:
@@ -475,16 +479,16 @@ function () {
       }, null, this);
     }
   }, {
-    key: "closeDialog",
-    value: function closeDialog() {
-      return regeneratorRuntime.async(function closeDialog$(_context18) {
+    key: "editAsset",
+    value: function editAsset(assetCode) {
+      return regeneratorRuntime.async(function editAsset$(_context18) {
         while (1) {
           switch (_context18.prev = _context18.next) {
             case 0:
               _context18.next = 2;
-              return regeneratorRuntime.awrap(this.page.getByRole("dialog").getByRole("button", {
-                name: "Close"
-              }).first().click());
+              return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
+                name: "Edit"
+              }).click());
 
             case 2:
             case "end":
@@ -494,19 +498,57 @@ function () {
       }, null, this);
     }
   }, {
-    key: "verifyTechnicalAssetTable",
-    value: function verifyTechnicalAssetTable() {
-      var _i, _arr, header;
-
-      return regeneratorRuntime.async(function verifyTechnicalAssetTable$(_context19) {
+    key: "viewAssetHistory",
+    value: function viewAssetHistory(assetCode) {
+      return regeneratorRuntime.async(function viewAssetHistory$(_context19) {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
               _context19.next = 2;
+              return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
+                name: "History"
+              }).click());
+
+            case 2:
+            case "end":
+              return _context19.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "closeDialog",
+    value: function closeDialog() {
+      return regeneratorRuntime.async(function closeDialog$(_context20) {
+        while (1) {
+          switch (_context20.prev = _context20.next) {
+            case 0:
+              _context20.next = 2;
+              return regeneratorRuntime.awrap(this.page.getByRole("dialog").getByRole("button", {
+                name: "Close"
+              }).first().click());
+
+            case 2:
+            case "end":
+              return _context20.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "verifyTechnicalAssetTable",
+    value: function verifyTechnicalAssetTable() {
+      var _i, _arr, header;
+
+      return regeneratorRuntime.async(function verifyTechnicalAssetTable$(_context21) {
+        while (1) {
+          switch (_context21.prev = _context21.next) {
+            case 0:
+              _context21.next = 2;
               return regeneratorRuntime.awrap(expect(this.technicalTab).toBeVisible());
 
             case 2:
-              _context19.next = 4;
+              _context21.next = 4;
               return regeneratorRuntime.awrap(expect(this.assetTable).toBeVisible());
 
             case 4:
@@ -514,28 +556,28 @@ function () {
 
             case 5:
               if (!(_i < _arr.length)) {
-                _context19.next = 12;
+                _context21.next = 12;
                 break;
               }
 
               header = _arr[_i];
-              _context19.next = 9;
+              _context21.next = 9;
               return regeneratorRuntime.awrap(expect(this.assetTable.getByRole("columnheader", {
                 name: new RegExp(header)
               })).toBeVisible());
 
             case 9:
               _i++;
-              _context19.next = 5;
+              _context21.next = 5;
               break;
 
             case 12:
-              _context19.next = 14;
+              _context21.next = 14;
               return regeneratorRuntime.awrap(expect(this.rows().first()).toBeVisible());
 
             case 14:
             case "end":
-              return _context19.stop();
+              return _context21.stop();
           }
         }
       }, null, this);
@@ -545,15 +587,15 @@ function () {
     value: function verifyAssetDetails(assetCode) {
       var _i2, _arr2, field;
 
-      return regeneratorRuntime.async(function verifyAssetDetails$(_context20) {
+      return regeneratorRuntime.async(function verifyAssetDetails$(_context22) {
         while (1) {
-          switch (_context20.prev = _context20.next) {
+          switch (_context22.prev = _context22.next) {
             case 0:
-              _context20.next = 2;
+              _context22.next = 2;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText("Asset Details"));
 
             case 2:
-              _context20.next = 4;
+              _context22.next = 4;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText(assetCode));
 
             case 4:
@@ -561,22 +603,22 @@ function () {
 
             case 5:
               if (!(_i2 < _arr2.length)) {
-                _context20.next = 12;
+                _context22.next = 12;
                 break;
               }
 
               field = _arr2[_i2];
-              _context20.next = 9;
+              _context22.next = 9;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText(field));
 
             case 9:
               _i2++;
-              _context20.next = 5;
+              _context22.next = 5;
               break;
 
             case 12:
             case "end":
-              return _context20.stop();
+              return _context22.stop();
           }
         }
       }, null, this);
@@ -584,20 +626,20 @@ function () {
   }, {
     key: "verifyHistory",
     value: function verifyHistory() {
-      return regeneratorRuntime.async(function verifyHistory$(_context21) {
+      return regeneratorRuntime.async(function verifyHistory$(_context23) {
         while (1) {
-          switch (_context21.prev = _context21.next) {
+          switch (_context23.prev = _context23.next) {
             case 0:
-              _context21.next = 2;
+              _context23.next = 2;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText("Asset History"));
 
             case 2:
-              _context21.next = 4;
+              _context23.next = 4;
               return regeneratorRuntime.awrap(expect(this.dialog().getByRole("list")).toBeVisible());
 
             case 4:
             case "end":
-              return _context21.stop();
+              return _context23.stop();
           }
         }
       }, null, this);

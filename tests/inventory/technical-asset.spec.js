@@ -3,45 +3,99 @@ const { test, expect } = require("../../fixtures/appFixtures");
 test.describe("Inventory - Technical Assets", () => {
   test.beforeEach(async ({ page, inventoryPage }) => {
     await page.goto("/");
-
     await inventoryPage.navigateToInventory();
-
     await expect(page).toHaveURL(/\/inventory/);
-
     await inventoryPage.openTechnicalAssets();
   });
 
   test("displays the Technical Assets table", async ({
-    page,
     technicalAssetPage,
   }) => {
     await technicalAssetPage.verifyTechnicalAssetTable();
-
     await expect(technicalAssetPage.pageIndicator).toBeVisible();
     await expect(technicalAssetPage.searchInput).toBeVisible();
   });
 
-  test("filters assets by type, status, location, and searches inventory", async ({
-    page,
+  test("applies multiple filters simultaneously", async ({
     technicalAssetPage,
   }) => {
     await technicalAssetPage.filterByAssetType("Desktop");
     await technicalAssetPage.filterByStatus("Available");
     await technicalAssetPage.filterByLocation("Kochi");
 
-    await expect(technicalAssetPage.rows().first()).toContainText("Desktop");
-    await expect(technicalAssetPage.rows().first()).toContainText("Kochi");
-    await expect(technicalAssetPage.rows().first()).toContainText("Available");
+    const rows = technicalAssetPage.rows();
 
-    await technicalAssetPage.searchAsset("TV-DT-6863");
+    await expect(rows.first()).toBeVisible();
 
-    await expect(technicalAssetPage.rows()).toHaveCount(1);
-    await expect(technicalAssetPage.rows().first()).toContainText("TV-DT-6863");
+    await expect(rows).toHaveCount(4);
 
-    await technicalAssetPage.clearSearch();
+    for (let i = 0; i < 4; i++) {
+      const row = rows.nth(i);
+
+      await expect(row).toContainText("Desktop");
+      await expect(row).toContainText("Kochi");
+      await expect(row).toContainText("Available");
+    }
+
+    await expect(technicalAssetPage.pageIndicator).toContainText("Page 1 of 1");
   });
 
-  test("moves between asset pages", async ({ page, technicalAssetPage }) => {
+  test("displays no results for a non-matching search", async ({
+    technicalAssetPage,
+  }) => {
+    await technicalAssetPage.searchAsset("NON_EXISTING_ASSET_99999");
+
+    await expect(
+      technicalAssetPage.technicalTab.getByText("No records found.", {
+        exact: true,
+      }),
+    ).toBeVisible();
+  });
+
+  test("clears search and restores the table", async ({
+    technicalAssetPage,
+  }) => {
+    const initialRows = await technicalAssetPage.rows().count();
+
+    await technicalAssetPage.searchAsset("TV-DT-6863");
+    await expect(technicalAssetPage.rows()).toHaveCount(1);
+
+    await technicalAssetPage.clearSearch();
+
+    await expect(technicalAssetPage.rows().first()).toBeVisible();
+
+    const restoredRows = await technicalAssetPage.rows().count();
+    expect(restoredRows).toBe(initialRows);
+  });
+
+  test("changes rows per page", async ({ technicalAssetPage }) => {
+    const rowsPerPage = technicalAssetPage.rowsPerPageSelect;
+
+    await expect(rowsPerPage).toBeVisible();
+
+    const currentValue = await rowsPerPage.inputValue();
+
+    const options = await rowsPerPage
+      .locator("option")
+      .evaluateAll((options) => options.map((option) => option.value));
+
+    const newValue = options.find((value) => value !== currentValue);
+
+    expect(newValue).toBeTruthy();
+
+    await technicalAssetPage.selectRowsPerPage(newValue);
+
+    await expect(rowsPerPage).toHaveValue(newValue);
+
+    const visibleRows = await technicalAssetPage.rows().count();
+
+    expect(visibleRows).toBeGreaterThan(0);
+    expect(visibleRows).toBeLessThanOrEqual(Number(newValue));
+  });
+
+  test("moves between asset pages using Previous and Next", async ({
+    technicalAssetPage,
+  }) => {
     await expect(technicalAssetPage.previousButton).toBeDisabled();
 
     await technicalAssetPage.clickNextPage();
@@ -52,6 +106,7 @@ test.describe("Inventory - Technical Assets", () => {
     await technicalAssetPage.clickPreviousPage();
 
     await expect(technicalAssetPage.previousButton).toBeDisabled();
+    await expect(technicalAssetPage.pageIndicator).toContainText("Page 1");
   });
 
   test("opens asset details, edit form, and history", async ({
@@ -109,7 +164,6 @@ test.describe("Inventory - Technical Assets", () => {
     });
 
     await expect(downloadLink).toBeVisible();
-
     await expect(downloadLink).toHaveAttribute("href", /addAssets\.xlsx/);
 
     const href = await technicalAssetPage.downloadBulkUploadTemplate();

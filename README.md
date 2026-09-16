@@ -48,6 +48,18 @@ Supported environment variables:
 Credentials are resolved by `config/credentials.js`. Keep credentials outside
 source control when running in CI or against shared environments.
 
+For local runs, set the credentials before executing the suite:
+
+```powershell
+$env:TEST_USER_EMAIL = "your-test-user@example.com"
+$env:TEST_USER_PASSWORD = "your-password"
+```
+
+If these variables are not set, the runner falls back to
+`test-data/loginData.json`. The authentication setup project creates
+`auth/auth.json` for the dependent authenticated projects; this file is
+generated locally and must not contain credentials committed to the repository.
+
 ## Framework Structure
 
 ```text
@@ -83,6 +95,10 @@ The current focused scope contains **87 executable end-to-end tests** across 8 t
 `tests/inventory/inventory.spec.js` is reserved for broader Inventory scenarios
 and currently contains no executable tests. Other module specifications are
 outside the current automation scope.
+
+Authenticated projects run in dependency order: `setup`, `login`, `dashboard`,
+`profile`, `inventory`, `user-management`, and `logout`. A failure in an
+upstream project prevents its dependent projects from running.
 
 ## Software License Coverage
 

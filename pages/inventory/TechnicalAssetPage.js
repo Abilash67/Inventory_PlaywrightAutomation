@@ -3,6 +3,7 @@ const { expect } = require("@playwright/test");
 class TechnicalAssetPage {
   constructor(page) {
     this.page = page;
+
     this.technicalTab = page.getByRole("tabpanel", {
       name: "Technical Assets",
     });
@@ -24,24 +25,37 @@ class TechnicalAssetPage {
     this.searchInput = this.technicalTab.getByPlaceholder(/Search Inventory/);
 
     this.assetTable = this.technicalTab.locator("table");
+
     this.previousButton = this.technicalTab.getByRole("button", {
       name: "Prev",
     });
+
     this.nextButton = this.technicalTab.getByRole("button", {
       name: "Next",
     });
+
     this.pageIndicator = this.technicalTab.getByText(/Page \d+ of \d+/);
+
     this.addAssetToggle = this.technicalTab.getByRole("button", {
       name: /Add Asset/,
     });
+
     this.addAssetMenuItem = this.page.getByRole("button", {
       name: "Add Asset",
       exact: true,
     });
+
     this.bulkUploadMenuItem = this.page.getByRole("button", {
       name: "Bulk Upload Assets",
       exact: true,
     });
+
+    // Pagination controls
+    this.pageButtons = this.technicalTab.getByRole("button", {
+      name: /^\d+$/,
+    });
+
+    this.rowsPerPageSelect = this.technicalTab.locator("select").last();
   }
 
   async searchAsset(searchText) {
@@ -60,9 +74,24 @@ class TechnicalAssetPage {
     await this.previousButton.click();
   }
 
+  async goToPage(pageNumber) {
+    await this.technicalTab
+      .getByRole("button", {
+        name: String(pageNumber),
+        exact: true,
+      })
+      .click();
+  }
+
+  async selectRowsPerPage(value) {
+    await this.rowsPerPageSelect.selectOption(String(value));
+  }
+
   async selectFilterOption(filter, option) {
     await filter.click();
+
     const filterContainer = filter.locator("..");
+
     const checkbox = filterContainer.getByRole("checkbox", {
       name: option,
       exact: true,
@@ -87,12 +116,14 @@ class TechnicalAssetPage {
   async openAddAssetForm() {
     await this.addAssetToggle.click();
     await this.addAssetMenuItem.click();
+
     await expect(this.page.getByRole("dialog")).toContainText("Add New Asset");
   }
 
   async openBulkUploadForm() {
     await this.addAssetToggle.click();
     await this.bulkUploadMenuItem.click();
+
     await expect(this.page.getByRole("dialog")).toContainText(
       "Bulk Upload Assets",
     );
@@ -108,36 +139,51 @@ class TechnicalAssetPage {
 
   async verifyAssetFormFields({ edit = false } = {}) {
     const expectedTitle = edit ? "Edit Asset" : "Add New Asset";
+
     await expect(this.dialog()).toContainText(expectedTitle);
 
     await expect(this.formSelect(0)).toBeVisible();
+
     await expect(
       this.dialog().getByPlaceholder("Auto-generated"),
     ).toBeVisible();
+
     await expect(
       this.dialog().getByPlaceholder("Enter Model Name"),
     ).toBeVisible();
+
     await expect(this.dialog().getByPlaceholder("Enter Storage")).toBeVisible();
+
     await expect(this.dialog().getByPlaceholder("Enter OS")).toBeVisible();
+
     await expect(
       this.dialog().getByPlaceholder("Enter RAM size"),
     ).toBeVisible();
+
     await expect(
       this.dialog().getByPlaceholder("Enter Processor Details"),
     ).toBeVisible();
+
     await expect(
       this.dialog().getByPlaceholder("Enter Purchase Amount"),
     ).toBeVisible();
+
     await expect(this.dialog().locator('input[type="date"]')).toBeVisible();
+
     await expect(this.formSelect(1)).toBeVisible();
     await expect(this.formSelect(2)).toBeVisible();
+
     await expect(
       this.dialog().getByPlaceholder("Additional notes about the asset"),
     ).toBeVisible();
   }
 
   async cancelDialog() {
-    await this.dialog().getByRole("button", { name: "Cancel" }).click();
+    await this.dialog()
+      .getByRole("button", {
+        name: "Cancel",
+      })
+      .click();
   }
 
   async downloadBulkUploadTemplate() {
@@ -156,6 +202,7 @@ class TechnicalAssetPage {
 
   async chooseBulkUploadFile(filePath) {
     await this.dialog().locator('input[type="file"]').setInputFiles(filePath);
+
     await expect(
       this.dialog().getByRole("button", {
         name: "Upload",
@@ -208,6 +255,7 @@ class TechnicalAssetPage {
   async verifyTechnicalAssetTable() {
     await expect(this.technicalTab).toBeVisible();
     await expect(this.assetTable).toBeVisible();
+
     for (const header of [
       "Asset Code",
       "Asset Type",
@@ -221,12 +269,14 @@ class TechnicalAssetPage {
         }),
       ).toBeVisible();
     }
+
     await expect(this.rows().first()).toBeVisible();
   }
 
   async verifyAssetDetails(assetCode) {
     await expect(this.dialog()).toContainText("Asset Details");
     await expect(this.dialog()).toContainText(assetCode);
+
     for (const field of [
       "Asset Code",
       "Asset Type",
