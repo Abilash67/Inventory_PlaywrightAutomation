@@ -32,7 +32,7 @@ class LoginPage {
 
   async openApplication() {
     await this.page.goto(loginUrl, {
-      waitUntil: "commit",
+      waitUntil: "domcontentloaded",
       timeout: 30000,
     });
 

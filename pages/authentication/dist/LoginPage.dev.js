@@ -46,7 +46,7 @@ function () {
             case 0:
               _context.next = 2;
               return regeneratorRuntime.awrap(this.page["goto"](loginUrl, {
-                waitUntil: "commit",
+                waitUntil: "domcontentloaded",
                 timeout: 30000
               }));
 

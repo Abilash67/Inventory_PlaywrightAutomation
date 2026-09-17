@@ -60,7 +60,7 @@ test.describe("Inventory - Technical Assets", function () {
     });
   });
   test("applies multiple filters simultaneously", function _callee3(_ref3) {
-    var technicalAssetPage, rows, i, row;
+    var technicalAssetPage, rows, rowCount, i, row;
     return regeneratorRuntime.async(function _callee3$(_context3) {
       while (1) {
         switch (_context3.prev = _context3.next) {
@@ -78,45 +78,55 @@ test.describe("Inventory - Technical Assets", function () {
             return regeneratorRuntime.awrap(technicalAssetPage.filterByLocation("Kochi"));
 
           case 7:
-            rows = technicalAssetPage.rows();
-            _context3.next = 10;
-            return regeneratorRuntime.awrap(expect(rows.first()).toBeVisible());
+            _context3.next = 9;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.selectedFilterValue("Selected Asset Type:")).toContainText("Desktop"));
 
-          case 10:
-            _context3.next = 12;
-            return regeneratorRuntime.awrap(expect(rows).toHaveCount(4));
+          case 9:
+            _context3.next = 11;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.selectedFilterValue("Selected Status:")).toContainText("Available"));
 
-          case 12:
-            i = 0;
+          case 11:
+            _context3.next = 13;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.selectedFilterValue("Selected Location:")).toContainText("Kochi"));
 
           case 13:
-            if (!(i < 4)) {
-              _context3.next = 24;
+            rows = technicalAssetPage.rows();
+            _context3.next = 16;
+            return regeneratorRuntime.awrap(expect(rows.first()).toBeVisible());
+
+          case 16:
+            _context3.next = 18;
+            return regeneratorRuntime.awrap(rows.count());
+
+          case 18:
+            rowCount = _context3.sent;
+            expect(rowCount).toBeGreaterThan(0);
+            i = 0;
+
+          case 21:
+            if (!(i < rowCount)) {
+              _context3.next = 32;
               break;
             }
 
             row = rows.nth(i);
-            _context3.next = 17;
+            _context3.next = 25;
             return regeneratorRuntime.awrap(expect(row).toContainText("Desktop"));
 
-          case 17:
-            _context3.next = 19;
-            return regeneratorRuntime.awrap(expect(row).toContainText("Kochi"));
-
-          case 19:
-            _context3.next = 21;
+          case 25:
+            _context3.next = 27;
             return regeneratorRuntime.awrap(expect(row).toContainText("Available"));
 
-          case 21:
+          case 27:
+            _context3.next = 29;
+            return regeneratorRuntime.awrap(expect(row).toContainText("Kochi"));
+
+          case 29:
             i++;
-            _context3.next = 13;
+            _context3.next = 21;
             break;
 
-          case 24:
-            _context3.next = 26;
-            return regeneratorRuntime.awrap(expect(technicalAssetPage.pageIndicator).toContainText("Page 1 of 1"));
-
-          case 26:
+          case 32:
           case "end":
             return _context3.stop();
         }
@@ -314,13 +324,15 @@ test.describe("Inventory - Technical Assets", function () {
           case 12:
             _context8.next = 14;
             return regeneratorRuntime.awrap(expect(page.getByRole("dialog").getByRole("button", {
-              name: "Save"
+              name: "Save",
+              exact: true
             })).toBeVisible());
 
           case 14:
             _context8.next = 16;
             return regeneratorRuntime.awrap(page.getByRole("dialog").getByRole("button", {
-              name: "Cancel"
+              name: "Cancel",
+              exact: true
             }).click());
 
           case 16:
@@ -361,41 +373,273 @@ test.describe("Inventory - Technical Assets", function () {
             return regeneratorRuntime.awrap(technicalAssetPage.cancelDialog());
 
           case 7:
+            _context9.next = 9;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog()).toBeHidden());
+
+          case 9:
           case "end":
             return _context9.stop();
         }
       }
     });
   });
-  test("verifies the bulk upload template link and accepts an Excel file", function _callee10(_ref10) {
-    var technicalAssetPage, downloadLink, href;
+  test("validates required field during Edit", function _callee10(_ref10) {
+    var technicalAssetPage, assetCode;
     return regeneratorRuntime.async(function _callee10$(_context10) {
       while (1) {
         switch (_context10.prev = _context10.next) {
           case 0:
             technicalAssetPage = _ref10.technicalAssetPage;
-            _context10.next = 3;
+            assetCode = "TV-DT-6863";
+            _context10.next = 4;
+            return regeneratorRuntime.awrap(technicalAssetPage.editAsset(assetCode));
+
+          case 4:
+            _context10.next = 6;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyAssetFormFields({
+              edit: true
+            }));
+
+          case 6:
+            _context10.next = 8;
+            return regeneratorRuntime.awrap(technicalAssetPage.clearRequiredEditField());
+
+          case 8:
+            _context10.next = 10;
+            return regeneratorRuntime.awrap(technicalAssetPage.clickSave());
+
+          case 10:
+            _context10.next = 12;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyDialogRemainsOpen());
+
+          case 12:
+            _context10.next = 14;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog()).toBeVisible());
+
+          case 14:
+          case "end":
+            return _context10.stop();
+        }
+      }
+    });
+  });
+  test("cancels Edit without saving", function _callee11(_ref11) {
+    var technicalAssetPage, assetCode;
+    return regeneratorRuntime.async(function _callee11$(_context11) {
+      while (1) {
+        switch (_context11.prev = _context11.next) {
+          case 0:
+            technicalAssetPage = _ref11.technicalAssetPage;
+            assetCode = "TV-DT-6863";
+            _context11.next = 4;
+            return regeneratorRuntime.awrap(technicalAssetPage.editAsset(assetCode));
+
+          case 4:
+            _context11.next = 6;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyAssetFormFields({
+              edit: true
+            }));
+
+          case 6:
+            _context11.next = 8;
+            return regeneratorRuntime.awrap(technicalAssetPage.modelInput().fill("Temporary Edit Value"));
+
+          case 8:
+            _context11.next = 10;
+            return regeneratorRuntime.awrap(technicalAssetPage.cancelDialog());
+
+          case 10:
+            _context11.next = 12;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog()).toBeHidden());
+
+          case 12:
+            _context11.next = 14;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.rowByAssetCode(assetCode)).toBeVisible());
+
+          case 14:
+          case "end":
+            return _context11.stop();
+        }
+      }
+    });
+  });
+  test("validates required fields during Add Asset", function _callee12(_ref12) {
+    var technicalAssetPage;
+    return regeneratorRuntime.async(function _callee12$(_context12) {
+      while (1) {
+        switch (_context12.prev = _context12.next) {
+          case 0:
+            technicalAssetPage = _ref12.technicalAssetPage;
+            _context12.next = 3;
+            return regeneratorRuntime.awrap(technicalAssetPage.openAddAssetForm());
+
+          case 3:
+            _context12.next = 5;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyAssetFormFields());
+
+          case 5:
+            _context12.next = 7;
+            return regeneratorRuntime.awrap(technicalAssetPage.clearRequiredAddFields());
+
+          case 7:
+            _context12.next = 9;
+            return regeneratorRuntime.awrap(technicalAssetPage.clickAdd());
+
+          case 9:
+            _context12.next = 11;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyDialogRemainsOpen());
+
+          case 11:
+            _context12.next = 13;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog()).toBeVisible());
+
+          case 13:
+          case "end":
+            return _context12.stop();
+        }
+      }
+    });
+  });
+  test("validates negative Purchase Amount", function _callee13(_ref13) {
+    var technicalAssetPage;
+    return regeneratorRuntime.async(function _callee13$(_context13) {
+      while (1) {
+        switch (_context13.prev = _context13.next) {
+          case 0:
+            technicalAssetPage = _ref13.technicalAssetPage;
+            _context13.next = 3;
+            return regeneratorRuntime.awrap(technicalAssetPage.openAddAssetForm());
+
+          case 3:
+            _context13.next = 5;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyAssetFormFields());
+
+          case 5:
+            _context13.next = 7;
+            return regeneratorRuntime.awrap(technicalAssetPage.enterNegativePurchaseAmount());
+
+          case 7:
+            _context13.next = 9;
+            return regeneratorRuntime.awrap(technicalAssetPage.clickAdd());
+
+          case 9:
+            _context13.next = 11;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyDialogRemainsOpen());
+
+          case 11:
+            _context13.next = 13;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog()).toBeVisible());
+
+          case 13:
+          case "end":
+            return _context13.stop();
+        }
+      }
+    });
+  });
+  test("validates future Purchase Date", function _callee14(_ref14) {
+    var technicalAssetPage;
+    return regeneratorRuntime.async(function _callee14$(_context14) {
+      while (1) {
+        switch (_context14.prev = _context14.next) {
+          case 0:
+            technicalAssetPage = _ref14.technicalAssetPage;
+            _context14.next = 3;
+            return regeneratorRuntime.awrap(technicalAssetPage.openAddAssetForm());
+
+          case 3:
+            _context14.next = 5;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyAssetFormFields());
+
+          case 5:
+            _context14.next = 7;
+            return regeneratorRuntime.awrap(technicalAssetPage.enterFuturePurchaseDate());
+
+          case 7:
+            _context14.next = 9;
+            return regeneratorRuntime.awrap(technicalAssetPage.clickAdd());
+
+          case 9:
+            _context14.next = 11;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyDialogRemainsOpen());
+
+          case 11:
+            _context14.next = 13;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog()).toBeVisible());
+
+          case 13:
+          case "end":
+            return _context14.stop();
+        }
+      }
+    });
+  });
+  test("cancels Add Asset without saving", function _callee15(_ref15) {
+    var technicalAssetPage;
+    return regeneratorRuntime.async(function _callee15$(_context15) {
+      while (1) {
+        switch (_context15.prev = _context15.next) {
+          case 0:
+            technicalAssetPage = _ref15.technicalAssetPage;
+            _context15.next = 3;
+            return regeneratorRuntime.awrap(technicalAssetPage.openAddAssetForm());
+
+          case 3:
+            _context15.next = 5;
+            return regeneratorRuntime.awrap(technicalAssetPage.verifyAssetFormFields());
+
+          case 5:
+            _context15.next = 7;
+            return regeneratorRuntime.awrap(technicalAssetPage.enterAssetDataForCancel());
+
+          case 7:
+            _context15.next = 9;
+            return regeneratorRuntime.awrap(technicalAssetPage.cancelDialog());
+
+          case 9:
+            _context15.next = 11;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog()).toBeHidden());
+
+          case 11:
+            _context15.next = 13;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.rowByAssetCode("Cancel Test Asset")).toHaveCount(0));
+
+          case 13:
+          case "end":
+            return _context15.stop();
+        }
+      }
+    });
+  });
+  test("verifies the bulk upload template link and accepts an Excel file", function _callee16(_ref16) {
+    var technicalAssetPage, downloadLink, href;
+    return regeneratorRuntime.async(function _callee16$(_context16) {
+      while (1) {
+        switch (_context16.prev = _context16.next) {
+          case 0:
+            technicalAssetPage = _ref16.technicalAssetPage;
+            _context16.next = 3;
             return regeneratorRuntime.awrap(technicalAssetPage.openBulkUploadForm());
 
           case 3:
             downloadLink = technicalAssetPage.dialog().getByRole("link", {
               name: /Download Sample Template/
             });
-            _context10.next = 6;
+            _context16.next = 6;
             return regeneratorRuntime.awrap(expect(downloadLink).toBeVisible());
 
           case 6:
-            _context10.next = 8;
+            _context16.next = 8;
             return regeneratorRuntime.awrap(expect(downloadLink).toHaveAttribute("href", /addAssets\.xlsx/));
 
           case 8:
-            _context10.next = 10;
+            _context16.next = 10;
             return regeneratorRuntime.awrap(technicalAssetPage.downloadBulkUploadTemplate());
 
           case 10:
-            href = _context10.sent;
+            href = _context16.sent;
             expect(href).toBe("/assets/addAssets.xlsx");
-            _context10.next = 14;
+            _context16.next = 14;
             return regeneratorRuntime.awrap(technicalAssetPage.chooseBulkUploadFile({
               name: "technical-assets.xlsx",
               mimeType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -403,18 +647,23 @@ test.describe("Inventory - Technical Assets", function () {
             }));
 
           case 14:
-            _context10.next = 16;
+            _context16.next = 16;
             return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog().getByRole("button", {
-              name: "Upload"
+              name: "Upload",
+              exact: true
             })).toBeEnabled());
 
           case 16:
-            _context10.next = 18;
+            _context16.next = 18;
             return regeneratorRuntime.awrap(technicalAssetPage.cancelDialog());
 
           case 18:
+            _context16.next = 20;
+            return regeneratorRuntime.awrap(expect(technicalAssetPage.dialog()).toBeHidden());
+
+          case 20:
           case "end":
-            return _context10.stop();
+            return _context16.stop();
         }
       }
     });

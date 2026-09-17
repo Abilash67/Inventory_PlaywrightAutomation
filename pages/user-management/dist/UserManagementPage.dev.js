@@ -45,16 +45,35 @@ function () {
   }
 
   _createClass(UserManagementPage, [{
-    key: "waitForListUpdate",
-    value: function waitForListUpdate() {
-      return regeneratorRuntime.async(function waitForListUpdate$(_context) {
+    key: "goto",
+    value: function goto() {
+      return regeneratorRuntime.async(function goto$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap(this.page.waitForTimeout(500));
+              return regeneratorRuntime.awrap(this.page["goto"](this.urls.userManagement, {
+                waitUntil: "domcontentloaded",
+                timeout: 30000
+              }));
 
             case 2:
+              _context.next = 4;
+              return regeneratorRuntime.awrap(expect(this.page).toHaveURL(/\/users(?:\/)?$/, {
+                timeout: 30000
+              }));
+
+            case 4:
+              _context.next = 6;
+              return regeneratorRuntime.awrap(expect(this.searchInput).toBeVisible({
+                timeout: 30000
+              }));
+
+            case 6:
+              _context.next = 8;
+              return regeneratorRuntime.awrap(this.waitForUserList());
+
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -62,58 +81,49 @@ function () {
       }, null, this);
     }
   }, {
-    key: "goto",
-    value: function goto() {
-      return regeneratorRuntime.async(function goto$(_context2) {
-        while (1) {
-          switch (_context2.prev = _context2.next) {
-            case 0:
-              _context2.next = 2;
-              return regeneratorRuntime.awrap(this.page["goto"](this.urls.userManagement, {
-                waitUntil: "commit",
-                timeout: 30000
-              }));
+    key: "waitForUserList",
+    value: function waitForUserList() {
+      var _this = this;
 
-            case 2:
-              _context2.next = 4;
-              return regeneratorRuntime.awrap(expect(this.page).toHaveURL(/\/users(?:\/)?$/, {
-                timeout: 30000
-              }));
-
-            case 4:
-              _context2.next = 6;
-              return regeneratorRuntime.awrap(expect(this.searchInput).toBeVisible({
-                timeout: 30000
-              }));
-
-            case 6:
-            case "end":
-              return _context2.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "searchUser",
-    value: function searchUser(value) {
-      return regeneratorRuntime.async(function searchUser$(_context3) {
+      var noResults;
+      return regeneratorRuntime.async(function waitForUserList$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
-              _context3.next = 2;
-              return regeneratorRuntime.awrap(this.searchInput.waitFor({
-                state: "visible"
-              }));
+              noResults = this.page.getByText(/No users found based on request|No records found\./i);
+              _context3.next = 3;
+              return regeneratorRuntime.awrap(expect.poll(function _callee() {
+                var userCount, emptyState;
+                return regeneratorRuntime.async(function _callee$(_context2) {
+                  while (1) {
+                    switch (_context2.prev = _context2.next) {
+                      case 0:
+                        _context2.next = 2;
+                        return regeneratorRuntime.awrap(_this.userCards.count());
 
-            case 2:
-              _context3.next = 4;
-              return regeneratorRuntime.awrap(this.searchInput.fill(value));
+                      case 2:
+                        userCount = _context2.sent;
+                        _context2.next = 5;
+                        return regeneratorRuntime.awrap(noResults.isVisible()["catch"](function () {
+                          return false;
+                        }));
 
-            case 4:
-              _context3.next = 6;
-              return regeneratorRuntime.awrap(this.waitForListUpdate());
+                      case 5:
+                        emptyState = _context2.sent;
+                        return _context2.abrupt("return", userCount > 0 || emptyState);
 
-            case 6:
+                      case 7:
+                      case "end":
+                        return _context2.stop();
+                    }
+                  }
+                });
+              }, {
+                timeout: 10000,
+                intervals: [100, 250, 500]
+              }).toBe(true));
+
+            case 3:
             case "end":
               return _context3.stop();
           }
@@ -121,20 +131,26 @@ function () {
       }, null, this);
     }
   }, {
-    key: "clearSearch",
-    value: function clearSearch() {
-      return regeneratorRuntime.async(function clearSearch$(_context4) {
+    key: "searchUser",
+    value: function searchUser(value) {
+      return regeneratorRuntime.async(function searchUser$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
               _context4.next = 2;
-              return regeneratorRuntime.awrap(this.searchInput.fill(""));
+              return regeneratorRuntime.awrap(this.searchInput.waitFor({
+                state: "visible"
+              }));
 
             case 2:
               _context4.next = 4;
-              return regeneratorRuntime.awrap(this.waitForListUpdate());
+              return regeneratorRuntime.awrap(this.searchInput.fill(value));
 
             case 4:
+              _context4.next = 6;
+              return regeneratorRuntime.awrap(this.waitForUserList());
+
+            case 6:
             case "end":
               return _context4.stop();
           }
@@ -142,25 +158,46 @@ function () {
       }, null, this);
     }
   }, {
-    key: "getUserCount",
-    value: function getUserCount() {
-      return regeneratorRuntime.async(function getUserCount$(_context5) {
+    key: "clearSearch",
+    value: function clearSearch() {
+      return regeneratorRuntime.async(function clearSearch$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
               _context5.next = 2;
-              return regeneratorRuntime.awrap(this.waitForListUpdate());
+              return regeneratorRuntime.awrap(this.searchInput.fill(""));
 
             case 2:
               _context5.next = 4;
-              return regeneratorRuntime.awrap(this.viewButtons.count());
+              return regeneratorRuntime.awrap(this.waitForUserList());
 
             case 4:
-              return _context5.abrupt("return", _context5.sent);
+            case "end":
+              return _context5.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "getUserCount",
+    value: function getUserCount() {
+      return regeneratorRuntime.async(function getUserCount$(_context6) {
+        while (1) {
+          switch (_context6.prev = _context6.next) {
+            case 0:
+              _context6.next = 2;
+              return regeneratorRuntime.awrap(this.waitForUserList());
+
+            case 2:
+              _context6.next = 4;
+              return regeneratorRuntime.awrap(this.userCards.count());
+
+            case 4:
+              return _context6.abrupt("return", _context6.sent);
 
             case 5:
             case "end":
-              return _context5.stop();
+              return _context6.stop();
           }
         }
       }, null, this);
@@ -177,20 +214,20 @@ function () {
   }, {
     key: "userExists",
     value: function userExists(userName) {
-      return regeneratorRuntime.async(function userExists$(_context6) {
+      return regeneratorRuntime.async(function userExists$(_context7) {
         while (1) {
-          switch (_context6.prev = _context6.next) {
+          switch (_context7.prev = _context7.next) {
             case 0:
-              _context6.next = 2;
+              _context7.next = 2;
               return regeneratorRuntime.awrap(this.getUserCard(userName).count());
 
             case 2:
-              _context6.t0 = _context6.sent;
-              return _context6.abrupt("return", _context6.t0 > 0);
+              _context7.t0 = _context7.sent;
+              return _context7.abrupt("return", _context7.t0 > 0);
 
             case 4:
             case "end":
-              return _context6.stop();
+              return _context7.stop();
           }
         }
       }, null, this);
@@ -199,35 +236,7 @@ function () {
     key: "getUserDetails",
     value: function getUserDetails(userName) {
       var card;
-      return regeneratorRuntime.async(function getUserDetails$(_context7) {
-        while (1) {
-          switch (_context7.prev = _context7.next) {
-            case 0:
-              card = this.getUserCard(userName);
-              _context7.next = 3;
-              return regeneratorRuntime.awrap(card.waitFor({
-                state: "visible"
-              }));
-
-            case 3:
-              _context7.next = 5;
-              return regeneratorRuntime.awrap(card.innerText());
-
-            case 5:
-              return _context7.abrupt("return", _context7.sent);
-
-            case 6:
-            case "end":
-              return _context7.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "clickCardAction",
-    value: function clickCardAction(userName, action) {
-      var card;
-      return regeneratorRuntime.async(function clickCardAction$(_context8) {
+      return regeneratorRuntime.async(function getUserDetails$(_context8) {
         while (1) {
           switch (_context8.prev = _context8.next) {
             case 0:
@@ -239,11 +248,12 @@ function () {
 
             case 3:
               _context8.next = 5;
-              return regeneratorRuntime.awrap(card.getByRole("button", {
-                name: new RegExp(action, "i")
-              }).click());
+              return regeneratorRuntime.awrap(card.innerText());
 
             case 5:
+              return _context8.abrupt("return", _context8.sent);
+
+            case 6:
             case "end":
               return _context8.stop();
           }
@@ -251,16 +261,26 @@ function () {
       }, null, this);
     }
   }, {
-    key: "viewUser",
-    value: function viewUser(userName) {
-      return regeneratorRuntime.async(function viewUser$(_context9) {
+    key: "clickCardAction",
+    value: function clickCardAction(userName, action) {
+      var card;
+      return regeneratorRuntime.async(function clickCardAction$(_context9) {
         while (1) {
           switch (_context9.prev = _context9.next) {
             case 0:
-              _context9.next = 2;
-              return regeneratorRuntime.awrap(this.clickCardAction(userName, "View"));
+              card = this.getUserCard(userName);
+              _context9.next = 3;
+              return regeneratorRuntime.awrap(card.waitFor({
+                state: "visible"
+              }));
 
-            case 2:
+            case 3:
+              _context9.next = 5;
+              return regeneratorRuntime.awrap(card.getByRole("button", {
+                name: new RegExp(action, "i")
+              }).click());
+
+            case 5:
             case "end":
               return _context9.stop();
           }
@@ -268,14 +288,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "editUser",
-    value: function editUser(userName) {
-      return regeneratorRuntime.async(function editUser$(_context10) {
+    key: "viewUser",
+    value: function viewUser(userName) {
+      return regeneratorRuntime.async(function viewUser$(_context10) {
         while (1) {
           switch (_context10.prev = _context10.next) {
             case 0:
               _context10.next = 2;
-              return regeneratorRuntime.awrap(this.clickCardAction(userName, "Edit"));
+              return regeneratorRuntime.awrap(this.clickCardAction(userName, "View"));
 
             case 2:
             case "end":
@@ -285,14 +305,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "viewAssets",
-    value: function viewAssets(userName) {
-      return regeneratorRuntime.async(function viewAssets$(_context11) {
+    key: "editUser",
+    value: function editUser(userName) {
+      return regeneratorRuntime.async(function editUser$(_context11) {
         while (1) {
           switch (_context11.prev = _context11.next) {
             case 0:
               _context11.next = 2;
-              return regeneratorRuntime.awrap(this.clickCardAction(userName, "Assets"));
+              return regeneratorRuntime.awrap(this.clickCardAction(userName, "Edit"));
 
             case 2:
             case "end":
@@ -302,14 +322,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "deleteUser",
-    value: function deleteUser(userName) {
-      return regeneratorRuntime.async(function deleteUser$(_context12) {
+    key: "viewAssets",
+    value: function viewAssets(userName) {
+      return regeneratorRuntime.async(function viewAssets$(_context12) {
         while (1) {
           switch (_context12.prev = _context12.next) {
             case 0:
               _context12.next = 2;
-              return regeneratorRuntime.awrap(this.clickCardAction(userName, "Delete"));
+              return regeneratorRuntime.awrap(this.clickCardAction(userName, "Assets"));
 
             case 2:
             case "end":
@@ -319,30 +339,16 @@ function () {
       }, null, this);
     }
   }, {
-    key: "hasCardAction",
-    value: function hasCardAction(userName, action) {
-      var card;
-      return regeneratorRuntime.async(function hasCardAction$(_context13) {
+    key: "deleteUser",
+    value: function deleteUser(userName) {
+      return regeneratorRuntime.async(function deleteUser$(_context13) {
         while (1) {
           switch (_context13.prev = _context13.next) {
             case 0:
-              card = this.getUserCard(userName);
-              _context13.next = 3;
-              return regeneratorRuntime.awrap(card.waitFor({
-                state: "visible"
-              }));
+              _context13.next = 2;
+              return regeneratorRuntime.awrap(this.clickCardAction(userName, "Delete"));
 
-            case 3:
-              _context13.next = 5;
-              return regeneratorRuntime.awrap(card.getByRole("button", {
-                name: new RegExp(action, "i")
-              }).count());
-
-            case 5:
-              _context13.t0 = _context13.sent;
-              return _context13.abrupt("return", _context13.t0 > 0);
-
-            case 7:
+            case 2:
             case "end":
               return _context13.stop();
           }
@@ -350,19 +356,30 @@ function () {
       }, null, this);
     }
   }, {
-    key: "hasViewButton",
-    value: function hasViewButton(userName) {
-      return regeneratorRuntime.async(function hasViewButton$(_context14) {
+    key: "hasCardAction",
+    value: function hasCardAction(userName, action) {
+      var card;
+      return regeneratorRuntime.async(function hasCardAction$(_context14) {
         while (1) {
           switch (_context14.prev = _context14.next) {
             case 0:
-              _context14.next = 2;
-              return regeneratorRuntime.awrap(this.hasCardAction(userName, "View"));
-
-            case 2:
-              return _context14.abrupt("return", _context14.sent);
+              card = this.getUserCard(userName);
+              _context14.next = 3;
+              return regeneratorRuntime.awrap(card.waitFor({
+                state: "visible"
+              }));
 
             case 3:
+              _context14.next = 5;
+              return regeneratorRuntime.awrap(card.getByRole("button", {
+                name: new RegExp(action, "i")
+              }).count());
+
+            case 5:
+              _context14.t0 = _context14.sent;
+              return _context14.abrupt("return", _context14.t0 > 0);
+
+            case 7:
             case "end":
               return _context14.stop();
           }
@@ -370,14 +387,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "hasEditButton",
-    value: function hasEditButton(userName) {
-      return regeneratorRuntime.async(function hasEditButton$(_context15) {
+    key: "hasViewButton",
+    value: function hasViewButton(userName) {
+      return regeneratorRuntime.async(function hasViewButton$(_context15) {
         while (1) {
           switch (_context15.prev = _context15.next) {
             case 0:
               _context15.next = 2;
-              return regeneratorRuntime.awrap(this.hasCardAction(userName, "Edit"));
+              return regeneratorRuntime.awrap(this.hasCardAction(userName, "View"));
 
             case 2:
               return _context15.abrupt("return", _context15.sent);
@@ -390,14 +407,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "hasAssetsButton",
-    value: function hasAssetsButton(userName) {
-      return regeneratorRuntime.async(function hasAssetsButton$(_context16) {
+    key: "hasEditButton",
+    value: function hasEditButton(userName) {
+      return regeneratorRuntime.async(function hasEditButton$(_context16) {
         while (1) {
           switch (_context16.prev = _context16.next) {
             case 0:
               _context16.next = 2;
-              return regeneratorRuntime.awrap(this.hasCardAction(userName, "Assets"));
+              return regeneratorRuntime.awrap(this.hasCardAction(userName, "Edit"));
 
             case 2:
               return _context16.abrupt("return", _context16.sent);
@@ -410,14 +427,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "hasDeleteButton",
-    value: function hasDeleteButton(userName) {
-      return regeneratorRuntime.async(function hasDeleteButton$(_context17) {
+    key: "hasAssetsButton",
+    value: function hasAssetsButton(userName) {
+      return regeneratorRuntime.async(function hasAssetsButton$(_context17) {
         while (1) {
           switch (_context17.prev = _context17.next) {
             case 0:
               _context17.next = 2;
-              return regeneratorRuntime.awrap(this.hasCardAction(userName, "Delete"));
+              return regeneratorRuntime.awrap(this.hasCardAction(userName, "Assets"));
 
             case 2:
               return _context17.abrupt("return", _context17.sent);
@@ -430,26 +447,19 @@ function () {
       }, null, this);
     }
   }, {
-    key: "selectFilter",
-    value: function selectFilter(dropdown, value) {
-      return regeneratorRuntime.async(function selectFilter$(_context18) {
+    key: "hasDeleteButton",
+    value: function hasDeleteButton(userName) {
+      return regeneratorRuntime.async(function hasDeleteButton$(_context18) {
         while (1) {
           switch (_context18.prev = _context18.next) {
             case 0:
               _context18.next = 2;
-              return regeneratorRuntime.awrap(dropdown.click());
+              return regeneratorRuntime.awrap(this.hasCardAction(userName, "Delete"));
 
             case 2:
-              _context18.next = 4;
-              return regeneratorRuntime.awrap(this.page.getByText(value, {
-                exact: true
-              }).last().click());
+              return _context18.abrupt("return", _context18.sent);
 
-            case 4:
-              _context18.next = 6;
-              return regeneratorRuntime.awrap(this.waitForListUpdate());
-
-            case 6:
+            case 3:
             case "end":
               return _context18.stop();
           }
@@ -457,16 +467,26 @@ function () {
       }, null, this);
     }
   }, {
-    key: "selectDepartment",
-    value: function selectDepartment(department) {
-      return regeneratorRuntime.async(function selectDepartment$(_context19) {
+    key: "selectFilter",
+    value: function selectFilter(dropdown, value) {
+      return regeneratorRuntime.async(function selectFilter$(_context19) {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
               _context19.next = 2;
-              return regeneratorRuntime.awrap(this.selectFilter(this.departmentDropdown, department));
+              return regeneratorRuntime.awrap(dropdown.click());
 
             case 2:
+              _context19.next = 4;
+              return regeneratorRuntime.awrap(this.page.getByText(value, {
+                exact: true
+              }).last().click());
+
+            case 4:
+              _context19.next = 6;
+              return regeneratorRuntime.awrap(this.waitForUserList());
+
+            case 6:
             case "end":
               return _context19.stop();
           }
@@ -474,14 +494,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "selectLocation",
-    value: function selectLocation(location) {
-      return regeneratorRuntime.async(function selectLocation$(_context20) {
+    key: "selectDepartment",
+    value: function selectDepartment(department) {
+      return regeneratorRuntime.async(function selectDepartment$(_context20) {
         while (1) {
           switch (_context20.prev = _context20.next) {
             case 0:
               _context20.next = 2;
-              return regeneratorRuntime.awrap(this.selectFilter(this.locationDropdown, location));
+              return regeneratorRuntime.awrap(this.selectFilter(this.departmentDropdown, department));
 
             case 2:
             case "end":
@@ -491,37 +511,16 @@ function () {
       }, null, this);
     }
   }, {
-    key: "clearLocation",
-    value: function clearLocation() {
-      return regeneratorRuntime.async(function clearLocation$(_context21) {
+    key: "selectLocation",
+    value: function selectLocation(location) {
+      return regeneratorRuntime.async(function selectLocation$(_context21) {
         while (1) {
           switch (_context21.prev = _context21.next) {
             case 0:
               _context21.next = 2;
-              return regeneratorRuntime.awrap(this.page.reload({
-                waitUntil: "commit",
-                timeout: 30000
-              }));
+              return regeneratorRuntime.awrap(this.selectFilter(this.locationDropdown, location));
 
             case 2:
-              _context21.next = 4;
-              return regeneratorRuntime.awrap(expect(this.page).toHaveURL(/\/users(?:\/)?$/, {
-                timeout: 30000
-              }));
-
-            case 4:
-              _context21.next = 6;
-              return regeneratorRuntime.awrap(expect(this.pageTitle).toBeVisible({
-                timeout: 30000
-              }));
-
-            case 6:
-              _context21.next = 8;
-              return regeneratorRuntime.awrap(expect(this.searchInput).toBeVisible({
-                timeout: 30000
-              }));
-
-            case 8:
             case "end":
               return _context21.stop();
           }
@@ -529,22 +528,60 @@ function () {
       }, null, this);
     }
   }, {
-    key: "resetSearch",
-    value: function resetSearch() {
-      return regeneratorRuntime.async(function resetSearch$(_context22) {
+    key: "clearLocation",
+    value: function clearLocation() {
+      return regeneratorRuntime.async(function clearLocation$(_context22) {
         while (1) {
           switch (_context22.prev = _context22.next) {
             case 0:
               _context22.next = 2;
-              return regeneratorRuntime.awrap(this.searchInput.fill(""));
+              return regeneratorRuntime.awrap(this.page.reload({
+                waitUntil: "domcontentloaded",
+                timeout: 30000
+              }));
 
             case 2:
               _context22.next = 4;
-              return regeneratorRuntime.awrap(this.waitForListUpdate());
+              return regeneratorRuntime.awrap(expect(this.page).toHaveURL(/\/users(?:\/)?$/, {
+                timeout: 30000
+              }));
 
             case 4:
+              _context22.next = 6;
+              return regeneratorRuntime.awrap(expect(this.pageTitle).toBeVisible({
+                timeout: 30000
+              }));
+
+            case 6:
+              _context22.next = 8;
+              return regeneratorRuntime.awrap(expect(this.searchInput).toBeVisible({
+                timeout: 30000
+              }));
+
+            case 8:
+              _context22.next = 10;
+              return regeneratorRuntime.awrap(this.waitForUserList());
+
+            case 10:
             case "end":
               return _context22.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "resetSearch",
+    value: function resetSearch() {
+      return regeneratorRuntime.async(function resetSearch$(_context23) {
+        while (1) {
+          switch (_context23.prev = _context23.next) {
+            case 0:
+              _context23.next = 2;
+              return regeneratorRuntime.awrap(this.clearSearch());
+
+            case 2:
+            case "end":
+              return _context23.stop();
           }
         }
       }, null, this);

@@ -50,7 +50,7 @@ class TechnicalAssetPage {
       exact: true,
     });
 
-    // Pagination controls
+    // Pagination buttons with numeric labels
     this.pageButtons = this.technicalTab.getByRole("button", {
       name: /^\d+$/,
     });
@@ -90,15 +90,21 @@ class TechnicalAssetPage {
   async selectFilterOption(filter, option) {
     await filter.click();
 
-    const filterContainer = filter.locator("..");
-
-    const checkbox = filterContainer.getByRole("checkbox", {
+    const checkbox = this.page.getByRole("checkbox", {
       name: option,
       exact: true,
     });
 
     await checkbox.check();
+
     await expect(checkbox).toBeChecked();
+  }
+
+  selectedFilterValue(label) {
+    return this.technicalTab
+      .locator("strong")
+      .filter({ hasText: label })
+      .locator("..");
   }
 
   async filterByAssetType(assetType) {
@@ -117,16 +123,14 @@ class TechnicalAssetPage {
     await this.addAssetToggle.click();
     await this.addAssetMenuItem.click();
 
-    await expect(this.page.getByRole("dialog")).toContainText("Add New Asset");
+    await expect(this.dialog()).toContainText("Add New Asset");
   }
 
   async openBulkUploadForm() {
     await this.addAssetToggle.click();
     await this.bulkUploadMenuItem.click();
 
-    await expect(this.page.getByRole("dialog")).toContainText(
-      "Bulk Upload Assets",
-    );
+    await expect(this.dialog()).toContainText("Bulk Upload Assets");
   }
 
   dialog() {
@@ -178,12 +182,112 @@ class TechnicalAssetPage {
     ).toBeVisible();
   }
 
+  saveButton() {
+    return this.dialog().getByRole("button", {
+      name: "Save",
+      exact: true,
+    });
+  }
+
+  addButton() {
+    return this.dialog().getByRole("button", {
+      name: "Add",
+      exact: true,
+    });
+  }
+
+  cancelButton() {
+    return this.dialog().getByRole("button", {
+      name: "Cancel",
+      exact: true,
+    });
+  }
+
+  modelInput() {
+    return this.dialog().getByPlaceholder("Enter Model Name");
+  }
+
+  storageInput() {
+    return this.dialog().getByPlaceholder("Enter Storage");
+  }
+
+  osInput() {
+    return this.dialog().getByPlaceholder("Enter OS");
+  }
+
+  ramInput() {
+    return this.dialog().getByPlaceholder("Enter RAM size");
+  }
+
+  processorInput() {
+    return this.dialog().getByPlaceholder("Enter Processor Details");
+  }
+
+  purchaseAmountInput() {
+    return this.dialog().getByPlaceholder("Enter Purchase Amount");
+  }
+
+  purchaseDateInput() {
+    return this.dialog().locator('input[type="date"]');
+  }
+
+  assetCodeInput() {
+    return this.dialog().getByPlaceholder("Auto-generated");
+  }
+
   async cancelDialog() {
-    await this.dialog()
-      .getByRole("button", {
-        name: "Cancel",
-      })
-      .click();
+    await this.cancelButton().click();
+    await expect(this.dialog()).toBeHidden();
+  }
+
+  async clickSave() {
+    await this.saveButton().click();
+  }
+
+  async clickAdd() {
+    await this.addButton().click();
+  }
+
+  async clearRequiredEditField() {
+    await this.modelInput().clear();
+  }
+
+  async clearRequiredAddFields() {
+    await this.modelInput().clear();
+  }
+
+  async enterNegativePurchaseAmount() {
+    await this.purchaseAmountInput().fill("-1");
+  }
+
+  async enterFuturePurchaseDate() {
+    const futureDate = new Date();
+
+    futureDate.setDate(futureDate.getDate() + 30);
+
+    const year = futureDate.getFullYear();
+    const month = String(futureDate.getMonth() + 1).padStart(2, "0");
+    const day = String(futureDate.getDate()).padStart(2, "0");
+
+    await this.purchaseDateInput().fill(`${year}-${month}-${day}`);
+  }
+
+  async enterAssetDataForCancel() {
+    await this.modelInput().fill("Cancel Test Asset");
+    await this.storageInput().fill("500GB");
+  }
+
+  async verifyDialogRemainsOpen() {
+    await expect(this.dialog()).toBeVisible();
+  }
+
+  async verifyFieldInvalid(locator) {
+    return locator.evaluate((element) => {
+      return (
+        element.matches(":invalid") ||
+        element.getAttribute("aria-invalid") === "true"
+      );
+    });
   }
 
   async downloadBulkUploadTemplate() {

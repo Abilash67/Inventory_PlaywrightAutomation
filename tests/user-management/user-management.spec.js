@@ -1,7 +1,9 @@
 const { test, expect } = require("@playwright/test");
+
 const {
   UserManagementPage,
 } = require("../../pages/user-management/UserManagementPage");
+
 const userData = require("../../test-data/userManagementData.json");
 
 test.describe("User Management - Complete Test Suite", () => {
@@ -9,6 +11,7 @@ test.describe("User Management - Complete Test Suite", () => {
 
   test.beforeEach(async ({ page }) => {
     userManagementPage = new UserManagementPage(page);
+
     await userManagementPage.goto();
   });
 
@@ -20,6 +23,7 @@ test.describe("User Management - Complete Test Suite", () => {
   // TC02 - USER LIST
   test("TC02 - Verify users are displayed", async () => {
     const count = await userManagementPage.getUserCount();
+
     expect(count).toBeGreaterThan(0);
   });
 
@@ -37,6 +41,7 @@ test.describe("User Management - Complete Test Suite", () => {
     await userManagementPage.searchUser(userData.searchData.validName);
 
     const count = await userManagementPage.getUserCount();
+
     expect(count).toBeGreaterThan(0);
 
     await expect(
@@ -46,11 +51,10 @@ test.describe("User Management - Complete Test Suite", () => {
 
   // TC05 - SEARCH BY EMPLOYEE ID
   test("TC05 - Search user using employee ID", async () => {
-    await userManagementPage.searchUser(
-      userData.searchData.validEmployeeId,
-    );
+    await userManagementPage.searchUser(userData.searchData.validEmployeeId);
 
     const count = await userManagementPage.getUserCount();
+
     expect(count).toBeGreaterThan(0);
 
     await expect(
@@ -63,6 +67,7 @@ test.describe("User Management - Complete Test Suite", () => {
     await userManagementPage.searchUser(userData.searchData.invalidName);
 
     const count = await userManagementPage.getUserCount();
+
     expect(count).toBe(0);
   });
 
@@ -214,9 +219,7 @@ test.describe("User Management - Complete Test Suite", () => {
 
   // TC22 - NON EXISTING USER
   test("TC22 - Verify non-existing user is not displayed", async () => {
-    const exists = await userManagementPage.userExists(
-      "UserDoesNotExist999",
-    );
+    const exists = await userManagementPage.userExists("UserDoesNotExist999");
 
     expect(exists).toBe(false);
   });
@@ -250,9 +253,7 @@ test.describe("User Management - Complete Test Suite", () => {
 
   // TC26 - DELETE CANCEL
   test("TC26 - Verify delete can be cancelled", async ({ page }) => {
-    const card = userManagementPage.getUserCard(
-      userData.validUser.name,
-    );
+    const card = userManagementPage.getUserCard(userData.validUser.name);
 
     await card
       .getByRole("button", {
@@ -337,8 +338,11 @@ test.describe("User Management - Complete Test Suite", () => {
     const user = userData.validUser.name;
 
     expect(await userManagementPage.hasViewButton(user)).toBe(true);
+
     expect(await userManagementPage.hasEditButton(user)).toBe(true);
+
     expect(await userManagementPage.hasAssetsButton(user)).toBe(true);
+
     expect(await userManagementPage.hasDeleteButton(user)).toBe(true);
   });
 
@@ -372,8 +376,7 @@ test.describe("User Management - Complete Test Suite", () => {
       timeout: 30000,
     });
 
-    const afterRefreshCount =
-      await userManagementPage.getUserCount();
+    const afterRefreshCount = await userManagementPage.getUserCount();
 
     expect(afterRefreshCount).toBe(initialCount);
   });

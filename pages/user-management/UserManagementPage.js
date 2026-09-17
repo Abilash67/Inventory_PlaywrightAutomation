@@ -45,13 +45,9 @@ class UserManagementPage {
     });
   }
 
-  async waitForListUpdate() {
-    await this.page.waitForTimeout(500);
-  }
-
   async goto() {
     await this.page.goto(this.urls.userManagement, {
-      waitUntil: "commit",
+      waitUntil: "domcontentloaded",
       timeout: 30000,
     });
 
@@ -62,22 +58,52 @@ class UserManagementPage {
     await expect(this.searchInput).toBeVisible({
       timeout: 30000,
     });
+
+    await this.waitForUserList();
+  }
+
+  async waitForUserList() {
+    const noResults = this.page.getByText(
+      /No users found based on request|No records found\./i,
+    );
+
+    await expect
+      .poll(
+        async () => {
+          const userCount = await this.userCards.count();
+
+          const emptyState = await noResults.isVisible().catch(() => false);
+
+          return userCount > 0 || emptyState;
+        },
+        {
+          timeout: 10000,
+          intervals: [100, 250, 500],
+        },
+      )
+      .toBe(true);
   }
 
   async searchUser(value) {
-    await this.searchInput.waitFor({ state: "visible" });
+    await this.searchInput.waitFor({
+      state: "visible",
+    });
+
     await this.searchInput.fill(value);
-    await this.waitForListUpdate();
+
+    await this.waitForUserList();
   }
 
   async clearSearch() {
     await this.searchInput.fill("");
-    await this.waitForListUpdate();
+
+    await this.waitForUserList();
   }
 
   async getUserCount() {
-    await this.waitForListUpdate();
-    return await this.viewButtons.count();
+    await this.waitForUserList();
+
+    return await this.userCards.count();
   }
 
   getUserCard(userName) {
@@ -96,7 +122,9 @@ class UserManagementPage {
   async getUserDetails(userName) {
     const card = this.getUserCard(userName);
 
-    await card.waitFor({ state: "visible" });
+    await card.waitFor({
+      state: "visible",
+    });
 
     return await card.innerText();
   }
@@ -104,7 +132,9 @@ class UserManagementPage {
   async clickCardAction(userName, action) {
     const card = this.getUserCard(userName);
 
-    await card.waitFor({ state: "visible" });
+    await card.waitFor({
+      state: "visible",
+    });
 
     await card
       .getByRole("button", {
@@ -132,7 +162,9 @@ class UserManagementPage {
   async hasCardAction(userName, action) {
     const card = this.getUserCard(userName);
 
-    await card.waitFor({ state: "visible" });
+    await card.waitFor({
+      state: "visible",
+    });
 
     return (
       (await card
@@ -169,7 +201,7 @@ class UserManagementPage {
       .last()
       .click();
 
-    await this.waitForListUpdate();
+    await this.waitForUserList();
   }
 
   async selectDepartment(department) {
@@ -182,7 +214,7 @@ class UserManagementPage {
 
   async clearLocation() {
     await this.page.reload({
-      waitUntil: "commit",
+      waitUntil: "domcontentloaded",
       timeout: 30000,
     });
 
@@ -197,10 +229,12 @@ class UserManagementPage {
     await expect(this.searchInput).toBeVisible({
       timeout: 30000,
     });
+
+    await this.waitForUserList();
   }
+
   async resetSearch() {
-    await this.searchInput.fill("");
-    await this.waitForListUpdate();
+    await this.clearSearch();
   }
 }
 
