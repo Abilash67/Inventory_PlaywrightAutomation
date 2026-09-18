@@ -1,14 +1,16 @@
 const { test } = require("@playwright/test");
 
+const DashboardPage = require("../../pages/dashboard/DashboardPage");
 const ProfilePage = require("../../pages/profile/ProfilePage");
-
 const { captureScreenshot } = require("../../utils/screenshotUtils");
 
 test("Profile Verification", async ({ page }) => {
+  const dashboard = new DashboardPage(page);
   const profile = new ProfilePage(page);
 
-  // Open the protected profile with the shared authenticated state.
-  await page.goto("/profile", { waitUntil: "networkidle" });
+  await page.goto("/");
+  await dashboard.verifyDashboardLoaded();
+  await dashboard.clickViewAssets();
 
   // 5. Verify Profile Page
   await profile.verifyProfileLoaded();

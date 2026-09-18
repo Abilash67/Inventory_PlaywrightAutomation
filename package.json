@@ -1,21 +1,25 @@
 {
   "name": "playwright",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Playwright end-to-end automation for Inventory",
   "scripts": {
     "test": "playwright test",
-    "test:user": "playwright test tests/user-management/user-management.spec.js --project=authenticated",
     "test:headed": "playwright test --headed",
-    "test:report": "playwright show-report"
+    "test:authentication": "playwright test tests/authentication",
+    "test:inventory": "playwright test tests/inventory/technical-asset.spec.js",
+    "report": "playwright show-report",
+    "codegen": "playwright codegen https://inventoryqa.techversantinfotech.com/login"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.62.1",
     "@types/node": "^26.1.2",
-    "allure-playwright": "^3.10.2"
+    "allure-playwright": "^3.10.2",
+    "eslint": "^10.10.0",
+    "globals": "^17.12.0"
   }
 }

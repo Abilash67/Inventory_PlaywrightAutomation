@@ -1,47 +1,83 @@
-const { defineConfig } = require("@playwright/test");
+const { defineConfig, devices } = require("@playwright/test");
+const path = require("path");
+const { getEnvironment } = require("./config/environments");
+
+const { baseURL } = getEnvironment();
+const isCI = Boolean(process.env.CI);
 
 module.exports = defineConfig({
-  // Test location
   testDir: "./tests",
-
-  // Overall test timeout
   timeout: 60000,
-
-  // Browser settings
+  fullyParallel: true,
+  forbidOnly: isCI,
+  retries: isCI ? 2 : 0,
+  workers: isCI ? 1 : undefined,
+  expect: {
+    timeout: 10000,
+  },
   use: {
+    baseURL,
     browserName: "chromium",
-
-    baseURL: "https://inventoryqa.techversantinfotech.com",
-
-    headless: false,
-
-    viewport: {
-      width: 1536,
-      height: 864,
-    },
-
-    // Action timeout
+    headless: process.env.HEADLESS === "true",
+    viewport: { width: 1536, height: 864 },
     actionTimeout: 10000,
-
-    // Navigation timeout
     navigationTimeout: 30000,
-
-    // Assertion timeout
-    expect: {
-      timeout: 10000,
-    },
-
-    // Screenshot when test fails
     screenshot: "only-on-failure",
-
-    // Record video when test fails
     video: "retain-on-failure",
-
-    // Trace when test fails
     trace: "retain-on-failure",
   },
-
-  // Reporters
+  projects: [
+    {
+      name: "setup",
+      testMatch: /tests[\\/]authentication[\\/]auth\.setup\.js/,
+    },
+    {
+      name: "login",
+      testMatch: /tests[\\/]authentication[\\/]login\.spec\.js/,
+      dependencies: ["setup"],
+    },
+    {
+      name: "dashboard",
+      testMatch: /tests[\\/]dashboard[\\/].*\.spec\.js/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: path.resolve(__dirname, "auth/auth.json"),
+      },
+      dependencies: ["login"],
+    },
+    {
+      name: "profile",
+      testMatch: /tests[\\/]profile[\\/].*\.spec\.js/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: path.resolve(__dirname, "auth/auth.json"),
+      },
+      dependencies: ["dashboard"],
+    },
+    {
+      name: "inventory",
+      testMatch: /tests[\\/]inventory[\\/].*\.spec\.js/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: path.resolve(__dirname, "auth/auth.json"),
+      },
+      dependencies: ["profile"],
+    },
+    {
+      name: "user-management",
+      testMatch: /tests[\\/]user-management[\\/].*\.spec\.js/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: path.resolve(__dirname, "auth/auth.json"),
+      },
+      dependencies: ["inventory"],
+    },
+    {
+      name: "logout",
+      testMatch: /tests[\\/]authentication[\\/]logout\.spec\.js/,
+      dependencies: ["user-management"],
+    },
+  ],
   reporter: [
     [
       "html",
@@ -59,24 +95,5 @@ module.exports = defineConfig({
         resultsDir: "allure-results",
       },
     ],
-  ],
-
-  projects: [
-    {
-      name: 'setup',
-      testMatch: /auth\.setup\.js/
-    },
-    {
-      name: 'authenticated',
-      dependencies: ['setup'],
-      testIgnore: /tests[\\/]authentication[\\/]/,
-      use: {
-        storageState: 'auth/auth.json'
-      }
-    },
-    {
-      name: 'authentication',
-      testMatch: /tests[\\/]authentication[\\/].*\.spec\.js/
-    }
   ],
 });
