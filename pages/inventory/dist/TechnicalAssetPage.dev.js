@@ -47,8 +47,7 @@ function () {
     this.bulkUploadMenuItem = this.page.getByRole("button", {
       name: "Bulk Upload Assets",
       exact: true
-    }); // Pagination buttons with numeric labels
-
+    });
     this.pageButtons = this.technicalTab.getByRole("button", {
       name: /^\d+$/
     });
@@ -309,6 +308,21 @@ function () {
       return this.dialog().locator("select").nth(index);
     }
   }, {
+    key: "assetTypeSelect",
+    value: function assetTypeSelect() {
+      return this.formSelect(0);
+    }
+  }, {
+    key: "locationSelect",
+    value: function locationSelect() {
+      return this.formSelect(1);
+    }
+  }, {
+    key: "statusSelect",
+    value: function statusSelect() {
+      return this.formSelect(2);
+    }
+  }, {
     key: "verifyAssetFormFields",
     value: function verifyAssetFormFields() {
       var _ref,
@@ -446,20 +460,69 @@ function () {
       return this.dialog().getByPlaceholder("Auto-generated");
     }
   }, {
-    key: "cancelDialog",
-    value: function cancelDialog() {
-      return regeneratorRuntime.async(function cancelDialog$(_context14) {
+    key: "remarksInput",
+    value: function remarksInput() {
+      return this.dialog().getByPlaceholder("Additional notes about the asset");
+    }
+  }, {
+    key: "fillValidAssetData",
+    value: function fillValidAssetData(_ref2) {
+      var assetType, model, storage, os, ram, processor, purchaseAmount, purchaseDate, location, status, remarks;
+      return regeneratorRuntime.async(function fillValidAssetData$(_context14) {
         while (1) {
           switch (_context14.prev = _context14.next) {
             case 0:
-              _context14.next = 2;
-              return regeneratorRuntime.awrap(this.cancelButton().click());
+              assetType = _ref2.assetType, model = _ref2.model, storage = _ref2.storage, os = _ref2.os, ram = _ref2.ram, processor = _ref2.processor, purchaseAmount = _ref2.purchaseAmount, purchaseDate = _ref2.purchaseDate, location = _ref2.location, status = _ref2.status, remarks = _ref2.remarks;
+              _context14.next = 3;
+              return regeneratorRuntime.awrap(this.assetTypeSelect().selectOption({
+                label: assetType
+              }));
 
-            case 2:
-              _context14.next = 4;
-              return regeneratorRuntime.awrap(expect(this.dialog()).toBeHidden());
+            case 3:
+              _context14.next = 5;
+              return regeneratorRuntime.awrap(this.modelInput().fill(model));
 
-            case 4:
+            case 5:
+              _context14.next = 7;
+              return regeneratorRuntime.awrap(this.storageInput().fill(storage));
+
+            case 7:
+              _context14.next = 9;
+              return regeneratorRuntime.awrap(this.osInput().fill(os));
+
+            case 9:
+              _context14.next = 11;
+              return regeneratorRuntime.awrap(this.ramInput().fill(ram));
+
+            case 11:
+              _context14.next = 13;
+              return regeneratorRuntime.awrap(this.processorInput().fill(processor));
+
+            case 13:
+              _context14.next = 15;
+              return regeneratorRuntime.awrap(this.purchaseAmountInput().fill(String(purchaseAmount)));
+
+            case 15:
+              _context14.next = 17;
+              return regeneratorRuntime.awrap(this.purchaseDateInput().fill(purchaseDate));
+
+            case 17:
+              _context14.next = 19;
+              return regeneratorRuntime.awrap(this.locationSelect().selectOption({
+                label: location
+              }));
+
+            case 19:
+              _context14.next = 21;
+              return regeneratorRuntime.awrap(this.statusSelect().selectOption({
+                label: status
+              }));
+
+            case 21:
+              _context14.next = 23;
+              return regeneratorRuntime.awrap(this.remarksInput().fill(remarks));
+
+            case 23:
             case "end":
               return _context14.stop();
           }
@@ -467,16 +530,20 @@ function () {
       }, null, this);
     }
   }, {
-    key: "clickSave",
-    value: function clickSave() {
-      return regeneratorRuntime.async(function clickSave$(_context15) {
+    key: "cancelDialog",
+    value: function cancelDialog() {
+      return regeneratorRuntime.async(function cancelDialog$(_context15) {
         while (1) {
           switch (_context15.prev = _context15.next) {
             case 0:
               _context15.next = 2;
-              return regeneratorRuntime.awrap(this.saveButton().click());
+              return regeneratorRuntime.awrap(this.cancelButton().click());
 
             case 2:
+              _context15.next = 4;
+              return regeneratorRuntime.awrap(expect(this.dialog()).toBeHidden());
+
+            case 4:
             case "end":
               return _context15.stop();
           }
@@ -484,14 +551,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "clickAdd",
-    value: function clickAdd() {
-      return regeneratorRuntime.async(function clickAdd$(_context16) {
+    key: "clickSave",
+    value: function clickSave() {
+      return regeneratorRuntime.async(function clickSave$(_context16) {
         while (1) {
           switch (_context16.prev = _context16.next) {
             case 0:
               _context16.next = 2;
-              return regeneratorRuntime.awrap(this.addButton().click());
+              return regeneratorRuntime.awrap(this.saveButton().click());
 
             case 2:
             case "end":
@@ -501,14 +568,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "clearRequiredEditField",
-    value: function clearRequiredEditField() {
-      return regeneratorRuntime.async(function clearRequiredEditField$(_context17) {
+    key: "clickAdd",
+    value: function clickAdd() {
+      return regeneratorRuntime.async(function clickAdd$(_context17) {
         while (1) {
           switch (_context17.prev = _context17.next) {
             case 0:
               _context17.next = 2;
-              return regeneratorRuntime.awrap(this.modelInput().clear());
+              return regeneratorRuntime.awrap(this.addButton().click());
 
             case 2:
             case "end":
@@ -518,9 +585,9 @@ function () {
       }, null, this);
     }
   }, {
-    key: "clearRequiredAddFields",
-    value: function clearRequiredAddFields() {
-      return regeneratorRuntime.async(function clearRequiredAddFields$(_context18) {
+    key: "clearRequiredEditField",
+    value: function clearRequiredEditField() {
+      return regeneratorRuntime.async(function clearRequiredEditField$(_context18) {
         while (1) {
           switch (_context18.prev = _context18.next) {
             case 0:
@@ -535,14 +602,14 @@ function () {
       }, null, this);
     }
   }, {
-    key: "enterNegativePurchaseAmount",
-    value: function enterNegativePurchaseAmount() {
-      return regeneratorRuntime.async(function enterNegativePurchaseAmount$(_context19) {
+    key: "clearRequiredAddFields",
+    value: function clearRequiredAddFields() {
+      return regeneratorRuntime.async(function clearRequiredAddFields$(_context19) {
         while (1) {
           switch (_context19.prev = _context19.next) {
             case 0:
               _context19.next = 2;
-              return regeneratorRuntime.awrap(this.purchaseAmountInput().fill("-1"));
+              return regeneratorRuntime.awrap(this.modelInput().clear());
 
             case 2:
             case "end":
@@ -552,22 +619,16 @@ function () {
       }, null, this);
     }
   }, {
-    key: "enterFuturePurchaseDate",
-    value: function enterFuturePurchaseDate() {
-      var futureDate, year, month, day;
-      return regeneratorRuntime.async(function enterFuturePurchaseDate$(_context20) {
+    key: "enterNegativePurchaseAmount",
+    value: function enterNegativePurchaseAmount() {
+      return regeneratorRuntime.async(function enterNegativePurchaseAmount$(_context20) {
         while (1) {
           switch (_context20.prev = _context20.next) {
             case 0:
-              futureDate = new Date();
-              futureDate.setDate(futureDate.getDate() + 30);
-              year = futureDate.getFullYear();
-              month = String(futureDate.getMonth() + 1).padStart(2, "0");
-              day = String(futureDate.getDate()).padStart(2, "0");
-              _context20.next = 7;
-              return regeneratorRuntime.awrap(this.purchaseDateInput().fill("".concat(year, "-").concat(month, "-").concat(day)));
+              _context20.next = 2;
+              return regeneratorRuntime.awrap(this.purchaseAmountInput().fill("-1"));
 
-            case 7:
+            case 2:
             case "end":
               return _context20.stop();
           }
@@ -575,20 +636,22 @@ function () {
       }, null, this);
     }
   }, {
-    key: "enterAssetDataForCancel",
-    value: function enterAssetDataForCancel() {
-      return regeneratorRuntime.async(function enterAssetDataForCancel$(_context21) {
+    key: "enterFuturePurchaseDate",
+    value: function enterFuturePurchaseDate() {
+      var futureDate, year, month, day;
+      return regeneratorRuntime.async(function enterFuturePurchaseDate$(_context21) {
         while (1) {
           switch (_context21.prev = _context21.next) {
             case 0:
-              _context21.next = 2;
-              return regeneratorRuntime.awrap(this.modelInput().fill("Cancel Test Asset"));
+              futureDate = new Date();
+              futureDate.setDate(futureDate.getDate() + 30);
+              year = futureDate.getFullYear();
+              month = String(futureDate.getMonth() + 1).padStart(2, "0");
+              day = String(futureDate.getDate()).padStart(2, "0");
+              _context21.next = 7;
+              return regeneratorRuntime.awrap(this.purchaseDateInput().fill("".concat(year, "-").concat(month, "-").concat(day)));
 
-            case 2:
-              _context21.next = 4;
-              return regeneratorRuntime.awrap(this.storageInput().fill("500GB"));
-
-            case 4:
+            case 7:
             case "end":
               return _context21.stop();
           }
@@ -596,16 +659,20 @@ function () {
       }, null, this);
     }
   }, {
-    key: "verifyDialogRemainsOpen",
-    value: function verifyDialogRemainsOpen() {
-      return regeneratorRuntime.async(function verifyDialogRemainsOpen$(_context22) {
+    key: "enterAssetDataForCancel",
+    value: function enterAssetDataForCancel() {
+      return regeneratorRuntime.async(function enterAssetDataForCancel$(_context22) {
         while (1) {
           switch (_context22.prev = _context22.next) {
             case 0:
               _context22.next = 2;
-              return regeneratorRuntime.awrap(expect(this.dialog()).toBeVisible());
+              return regeneratorRuntime.awrap(this.modelInput().fill("Cancel Test Asset"));
 
             case 2:
+              _context22.next = 4;
+              return regeneratorRuntime.awrap(this.storageInput().fill("500GB"));
+
+            case 4:
             case "end":
               return _context22.stop();
           }
@@ -613,19 +680,36 @@ function () {
       }, null, this);
     }
   }, {
-    key: "verifyFieldInvalid",
-    value: function verifyFieldInvalid(locator) {
-      return regeneratorRuntime.async(function verifyFieldInvalid$(_context23) {
+    key: "verifyDialogRemainsOpen",
+    value: function verifyDialogRemainsOpen() {
+      return regeneratorRuntime.async(function verifyDialogRemainsOpen$(_context23) {
         while (1) {
           switch (_context23.prev = _context23.next) {
             case 0:
-              return _context23.abrupt("return", locator.evaluate(function (element) {
+              _context23.next = 2;
+              return regeneratorRuntime.awrap(expect(this.dialog()).toBeVisible());
+
+            case 2:
+            case "end":
+              return _context23.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "verifyFieldInvalid",
+    value: function verifyFieldInvalid(locator) {
+      return regeneratorRuntime.async(function verifyFieldInvalid$(_context24) {
+        while (1) {
+          switch (_context24.prev = _context24.next) {
+            case 0:
+              return _context24.abrupt("return", locator.evaluate(function (element) {
                 return element.matches(":invalid") || element.getAttribute("aria-invalid") === "true";
               }));
 
             case 1:
             case "end":
-              return _context23.stop();
+              return _context24.stop();
           }
         }
       });
@@ -634,28 +718,28 @@ function () {
     key: "downloadBulkUploadTemplate",
     value: function downloadBulkUploadTemplate() {
       var downloadLink, href;
-      return regeneratorRuntime.async(function downloadBulkUploadTemplate$(_context24) {
+      return regeneratorRuntime.async(function downloadBulkUploadTemplate$(_context25) {
         while (1) {
-          switch (_context24.prev = _context24.next) {
+          switch (_context25.prev = _context25.next) {
             case 0:
               downloadLink = this.dialog().getByRole("link", {
                 name: /Download Sample Template/
               });
-              _context24.next = 3;
+              _context25.next = 3;
               return regeneratorRuntime.awrap(expect(downloadLink).toBeVisible());
 
             case 3:
-              _context24.next = 5;
+              _context25.next = 5;
               return regeneratorRuntime.awrap(downloadLink.getAttribute("href"));
 
             case 5:
-              href = _context24.sent;
+              href = _context25.sent;
               expect(href).toBe("/assets/addAssets.xlsx");
-              return _context24.abrupt("return", href);
+              return _context25.abrupt("return", href);
 
             case 8:
             case "end":
-              return _context24.stop();
+              return _context25.stop();
           }
         }
       }, null, this);
@@ -663,22 +747,22 @@ function () {
   }, {
     key: "chooseBulkUploadFile",
     value: function chooseBulkUploadFile(filePath) {
-      return regeneratorRuntime.async(function chooseBulkUploadFile$(_context25) {
+      return regeneratorRuntime.async(function chooseBulkUploadFile$(_context26) {
         while (1) {
-          switch (_context25.prev = _context25.next) {
+          switch (_context26.prev = _context26.next) {
             case 0:
-              _context25.next = 2;
+              _context26.next = 2;
               return regeneratorRuntime.awrap(this.dialog().locator('input[type="file"]').setInputFiles(filePath));
 
             case 2:
-              _context25.next = 4;
+              _context26.next = 4;
               return regeneratorRuntime.awrap(expect(this.dialog().getByRole("button", {
                 name: "Upload"
               })).toBeEnabled());
 
             case 4:
             case "end":
-              return _context25.stop();
+              return _context26.stop();
           }
         }
       }, null, this);
@@ -698,32 +782,13 @@ function () {
   }, {
     key: "viewAsset",
     value: function viewAsset(assetCode) {
-      return regeneratorRuntime.async(function viewAsset$(_context26) {
-        while (1) {
-          switch (_context26.prev = _context26.next) {
-            case 0:
-              _context26.next = 2;
-              return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
-                name: "View"
-              }).click());
-
-            case 2:
-            case "end":
-              return _context26.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "editAsset",
-    value: function editAsset(assetCode) {
-      return regeneratorRuntime.async(function editAsset$(_context27) {
+      return regeneratorRuntime.async(function viewAsset$(_context27) {
         while (1) {
           switch (_context27.prev = _context27.next) {
             case 0:
               _context27.next = 2;
               return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
-                name: "Edit"
+                name: "View"
               }).click());
 
             case 2:
@@ -734,15 +799,15 @@ function () {
       }, null, this);
     }
   }, {
-    key: "viewAssetHistory",
-    value: function viewAssetHistory(assetCode) {
-      return regeneratorRuntime.async(function viewAssetHistory$(_context28) {
+    key: "editAsset",
+    value: function editAsset(assetCode) {
+      return regeneratorRuntime.async(function editAsset$(_context28) {
         while (1) {
           switch (_context28.prev = _context28.next) {
             case 0:
               _context28.next = 2;
               return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
-                name: "History"
+                name: "Edit"
               }).click());
 
             case 2:
@@ -753,16 +818,16 @@ function () {
       }, null, this);
     }
   }, {
-    key: "closeDialog",
-    value: function closeDialog() {
-      return regeneratorRuntime.async(function closeDialog$(_context29) {
+    key: "viewAssetHistory",
+    value: function viewAssetHistory(assetCode) {
+      return regeneratorRuntime.async(function viewAssetHistory$(_context29) {
         while (1) {
           switch (_context29.prev = _context29.next) {
             case 0:
               _context29.next = 2;
-              return regeneratorRuntime.awrap(this.page.getByRole("dialog").getByRole("button", {
-                name: "Close"
-              }).first().click());
+              return regeneratorRuntime.awrap(this.rowByAssetCode(assetCode).getByRole("button", {
+                name: "History"
+              }).click());
 
             case 2:
             case "end":
@@ -772,19 +837,38 @@ function () {
       }, null, this);
     }
   }, {
-    key: "verifyTechnicalAssetTable",
-    value: function verifyTechnicalAssetTable() {
-      var _i, _arr, header;
-
-      return regeneratorRuntime.async(function verifyTechnicalAssetTable$(_context30) {
+    key: "closeDialog",
+    value: function closeDialog() {
+      return regeneratorRuntime.async(function closeDialog$(_context30) {
         while (1) {
           switch (_context30.prev = _context30.next) {
             case 0:
               _context30.next = 2;
+              return regeneratorRuntime.awrap(this.page.getByRole("dialog").getByRole("button", {
+                name: "Close"
+              }).first().click());
+
+            case 2:
+            case "end":
+              return _context30.stop();
+          }
+        }
+      }, null, this);
+    }
+  }, {
+    key: "verifyTechnicalAssetTable",
+    value: function verifyTechnicalAssetTable() {
+      var _i, _arr, header;
+
+      return regeneratorRuntime.async(function verifyTechnicalAssetTable$(_context31) {
+        while (1) {
+          switch (_context31.prev = _context31.next) {
+            case 0:
+              _context31.next = 2;
               return regeneratorRuntime.awrap(expect(this.technicalTab).toBeVisible());
 
             case 2:
-              _context30.next = 4;
+              _context31.next = 4;
               return regeneratorRuntime.awrap(expect(this.assetTable).toBeVisible());
 
             case 4:
@@ -792,28 +876,28 @@ function () {
 
             case 5:
               if (!(_i < _arr.length)) {
-                _context30.next = 12;
+                _context31.next = 12;
                 break;
               }
 
               header = _arr[_i];
-              _context30.next = 9;
+              _context31.next = 9;
               return regeneratorRuntime.awrap(expect(this.assetTable.getByRole("columnheader", {
                 name: new RegExp(header)
               })).toBeVisible());
 
             case 9:
               _i++;
-              _context30.next = 5;
+              _context31.next = 5;
               break;
 
             case 12:
-              _context30.next = 14;
+              _context31.next = 14;
               return regeneratorRuntime.awrap(expect(this.rows().first()).toBeVisible());
 
             case 14:
             case "end":
-              return _context30.stop();
+              return _context31.stop();
           }
         }
       }, null, this);
@@ -823,15 +907,15 @@ function () {
     value: function verifyAssetDetails(assetCode) {
       var _i2, _arr2, field;
 
-      return regeneratorRuntime.async(function verifyAssetDetails$(_context31) {
+      return regeneratorRuntime.async(function verifyAssetDetails$(_context32) {
         while (1) {
-          switch (_context31.prev = _context31.next) {
+          switch (_context32.prev = _context32.next) {
             case 0:
-              _context31.next = 2;
+              _context32.next = 2;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText("Asset Details"));
 
             case 2:
-              _context31.next = 4;
+              _context32.next = 4;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText(assetCode));
 
             case 4:
@@ -839,22 +923,22 @@ function () {
 
             case 5:
               if (!(_i2 < _arr2.length)) {
-                _context31.next = 12;
+                _context32.next = 12;
                 break;
               }
 
               field = _arr2[_i2];
-              _context31.next = 9;
+              _context32.next = 9;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText(field));
 
             case 9:
               _i2++;
-              _context31.next = 5;
+              _context32.next = 5;
               break;
 
             case 12:
             case "end":
-              return _context31.stop();
+              return _context32.stop();
           }
         }
       }, null, this);
@@ -862,23 +946,99 @@ function () {
   }, {
     key: "verifyHistory",
     value: function verifyHistory() {
-      return regeneratorRuntime.async(function verifyHistory$(_context32) {
+      return regeneratorRuntime.async(function verifyHistory$(_context33) {
         while (1) {
-          switch (_context32.prev = _context32.next) {
+          switch (_context33.prev = _context33.next) {
             case 0:
-              _context32.next = 2;
+              _context33.next = 2;
               return regeneratorRuntime.awrap(expect(this.dialog()).toContainText("Asset History"));
 
             case 2:
-              _context32.next = 4;
+              _context33.next = 4;
               return regeneratorRuntime.awrap(expect(this.dialog().getByRole("list")).toBeVisible());
 
             case 4:
             case "end":
-              return _context32.stop();
+              return _context33.stop();
           }
         }
       }, null, this);
+    }
+  }, {
+    key: "verifyAssetRow",
+    value: function verifyAssetRow(assetCode, expectedData) {
+      var row, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, value;
+
+      return regeneratorRuntime.async(function verifyAssetRow$(_context34) {
+        while (1) {
+          switch (_context34.prev = _context34.next) {
+            case 0:
+              row = this.rowByAssetCode(assetCode);
+              _context34.next = 3;
+              return regeneratorRuntime.awrap(expect(row).toBeVisible());
+
+            case 3:
+              _iteratorNormalCompletion = true;
+              _didIteratorError = false;
+              _iteratorError = undefined;
+              _context34.prev = 6;
+              _iterator = expectedData[Symbol.iterator]();
+
+            case 8:
+              if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
+                _context34.next = 15;
+                break;
+              }
+
+              value = _step.value;
+              _context34.next = 12;
+              return regeneratorRuntime.awrap(expect(row).toContainText(String(value)));
+
+            case 12:
+              _iteratorNormalCompletion = true;
+              _context34.next = 8;
+              break;
+
+            case 15:
+              _context34.next = 21;
+              break;
+
+            case 17:
+              _context34.prev = 17;
+              _context34.t0 = _context34["catch"](6);
+              _didIteratorError = true;
+              _iteratorError = _context34.t0;
+
+            case 21:
+              _context34.prev = 21;
+              _context34.prev = 22;
+
+              if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+                _iterator["return"]();
+              }
+
+            case 24:
+              _context34.prev = 24;
+
+              if (!_didIteratorError) {
+                _context34.next = 27;
+                break;
+              }
+
+              throw _iteratorError;
+
+            case 27:
+              return _context34.finish(24);
+
+            case 28:
+              return _context34.finish(21);
+
+            case 29:
+            case "end":
+              return _context34.stop();
+          }
+        }
+      }, null, this, [[6, 17, 21, 29], [22,, 24, 28]]);
     }
   }]);
 

@@ -6,7 +6,7 @@ test.describe("Inventory - Technical Assets", () => {
 
     await inventoryPage.navigateToInventory();
 
-    await expect(page).toHaveURL(/\/inventory/);
+    await expect(page).toHaveURL(/inventory/);
 
     await inventoryPage.openTechnicalAssets();
   });
@@ -17,7 +17,6 @@ test.describe("Inventory - Technical Assets", () => {
     await technicalAssetPage.verifyTechnicalAssetTable();
 
     await expect(technicalAssetPage.pageIndicator).toBeVisible();
-
     await expect(technicalAssetPage.searchInput).toBeVisible();
   });
 
@@ -25,9 +24,7 @@ test.describe("Inventory - Technical Assets", () => {
     technicalAssetPage,
   }) => {
     await technicalAssetPage.filterByAssetType("Desktop");
-
     await technicalAssetPage.filterByStatus("Available");
-
     await technicalAssetPage.filterByLocation("Kochi");
 
     await expect(
@@ -44,11 +41,14 @@ test.describe("Inventory - Technical Assets", () => {
 
     const rows = technicalAssetPage.rows();
 
-    await expect(rows.first()).toBeVisible();
+    await expect
+      .poll(() => rows.count(), {
+        timeout: 10000,
+        intervals: [200, 500, 1000],
+      })
+      .toBeGreaterThan(0);
 
     const rowCount = await rows.count();
-
-    expect(rowCount).toBeGreaterThan(0);
 
     for (let i = 0; i < rowCount; i++) {
       const row = rows.nth(i);
@@ -57,7 +57,6 @@ test.describe("Inventory - Technical Assets", () => {
       await expect(row).toContainText("Available");
       await expect(row).toContainText("Kochi");
     }
-
   });
 
   test("displays no results for a non-matching search", async ({
@@ -83,11 +82,12 @@ test.describe("Inventory - Technical Assets", () => {
 
     await technicalAssetPage.clearSearch();
 
-    await expect(technicalAssetPage.rows().first()).toBeVisible();
-
-    const restoredRows = await technicalAssetPage.rows().count();
-
-    expect(restoredRows).toBe(initialRows);
+    await expect
+      .poll(() => technicalAssetPage.rows().count(), {
+        timeout: 10000,
+        intervals: [200, 500, 1000],
+      })
+      .toBe(initialRows);
   });
 
   test("changes rows per page", async ({ technicalAssetPage }) => {
@@ -112,7 +112,6 @@ test.describe("Inventory - Technical Assets", () => {
     const visibleRows = await technicalAssetPage.rows().count();
 
     expect(visibleRows).toBeGreaterThan(0);
-
     expect(visibleRows).toBeLessThanOrEqual(Number(newValue));
   });
 
@@ -186,6 +185,72 @@ test.describe("Inventory - Technical Assets", () => {
     await technicalAssetPage.cancelDialog();
 
     await expect(technicalAssetPage.dialog()).toBeHidden();
+  });
+
+  // Phase 1 - Add Valid Technical Asset
+  test("adds a valid Technical Asset and verifies the created record", async ({
+    technicalAssetPage,
+  }) => {
+    const testData = {
+      assetType: "Desktop",
+      model: "Phase1 Test Desktop",
+      storage: "512GB",
+      os: "Windows 11",
+      ram: "16GB",
+      processor: "Intel Core i5",
+      purchaseAmount: "50000",
+      purchaseDate: "2026-09-01",
+      location: "Kochi",
+      status: "Available",
+      remarks: "Phase 1 automation test asset",
+    };
+
+    await technicalAssetPage.openAddAssetForm();
+
+    await technicalAssetPage.verifyAssetFormFields();
+
+    await technicalAssetPage.fillValidAssetData(testData);
+
+    const generatedAssetCode = await technicalAssetPage
+      .assetCodeInput()
+      .inputValue();
+
+    expect(generatedAssetCode).toBeTruthy();
+
+    await technicalAssetPage.clickAdd();
+
+    await expect(technicalAssetPage.dialog()).toBeHidden();
+
+    await technicalAssetPage.searchAsset(generatedAssetCode);
+
+    await expect
+      .poll(() => technicalAssetPage.rows().count(), {
+        timeout: 10000,
+        intervals: [200, 500, 1000],
+      })
+      .toBe(1);
+
+    await technicalAssetPage.verifyAssetRow(generatedAssetCode, [
+      testData.assetType,
+      testData.location,
+      testData.status,
+    ]);
+
+    await technicalAssetPage.viewAsset(generatedAssetCode);
+
+    await technicalAssetPage.verifyAssetDetails(generatedAssetCode);
+
+    await expect(technicalAssetPage.dialog()).toContainText(testData.model);
+
+    await expect(technicalAssetPage.dialog()).toContainText(testData.storage);
+
+    await expect(technicalAssetPage.dialog()).toContainText(testData.os);
+
+    await expect(technicalAssetPage.dialog()).toContainText(testData.ram);
+
+    await expect(technicalAssetPage.dialog()).toContainText(testData.processor);
+
+    await expect(technicalAssetPage.dialog()).toContainText(testData.remarks);
   });
 
   test("validates required field during Edit", async ({

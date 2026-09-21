@@ -186,26 +186,28 @@ test.describe("Inventory - Software Licenses", function () {
     });
   });
   test("opens the Add License form with supported fields", function _callee6(_ref6) {
-    var softwareLicensePage;
+    var page, softwareLicensePage;
     return regeneratorRuntime.async(function _callee6$(_context6) {
       while (1) {
         switch (_context6.prev = _context6.next) {
           case 0:
-            softwareLicensePage = _ref6.softwareLicensePage;
+            page = _ref6.page, softwareLicensePage = _ref6.softwareLicensePage;
             _context6.next = 3;
             return regeneratorRuntime.awrap(softwareLicensePage.openAddLicenseForm());
 
           case 3:
             _context6.next = 5;
-            return regeneratorRuntime.awrap(softwareLicensePage.verifyLicenseForm());
+            return regeneratorRuntime.awrap(expect(page.getByRole("dialog")).toBeVisible());
 
           case 5:
             _context6.next = 7;
-            return regeneratorRuntime.awrap(softwareLicensePage.dialog().getByRole("button", {
-              name: "Cancel"
-            }).click());
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyLicenseForm());
 
           case 7:
+            _context6.next = 9;
+            return regeneratorRuntime.awrap(softwareLicensePage.cancelForm());
+
+          case 9:
           case "end":
             return _context6.stop();
         }
@@ -353,9 +355,7 @@ test.describe("Inventory - Software Licenses", function () {
             isTrapped = _context9.sent;
             expect(isTrapped).toBe(true);
             _context9.next = 27;
-            return regeneratorRuntime.awrap(dialog.getByRole("button", {
-              name: "Cancel"
-            }).click());
+            return regeneratorRuntime.awrap(softwareLicensePage.cancelForm());
 
           case 27:
           case "end":
@@ -430,9 +430,7 @@ test.describe("Inventory - Software Licenses", function () {
 
           case 20:
             _context10.next = 22;
-            return regeneratorRuntime.awrap(softwareLicensePage.dialog().getByRole("button", {
-              name: "Cancel"
-            }).click());
+            return regeneratorRuntime.awrap(softwareLicensePage.cancelForm());
 
           case 22:
             _context10.next = 24;
@@ -444,6 +442,509 @@ test.describe("Inventory - Software Licenses", function () {
           case 24:
           case "end":
             return _context10.stop();
+        }
+      }
+    });
+  });
+  test("adds a valid software license and verifies it", function _callee11(_ref11) {
+    var softwareLicensePage, options, software, licenseKey;
+    return regeneratorRuntime.async(function _callee11$(_context11) {
+      while (1) {
+        switch (_context11.prev = _context11.next) {
+          case 0:
+            softwareLicensePage = _ref11.softwareLicensePage;
+            _context11.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.openAddLicenseForm());
+
+          case 3:
+            _context11.next = 5;
+            return regeneratorRuntime.awrap(softwareLicensePage.getSoftwareOptions());
+
+          case 5:
+            options = _context11.sent;
+            software = options.find(function (option) {
+              return option.trim() && !/select|choose/i.test(option);
+            });
+            expect(software).toBeTruthy();
+            licenseKey = "AUTO-LIC-".concat(Date.now());
+            _context11.next = 11;
+            return regeneratorRuntime.awrap(softwareLicensePage.fillLicenseForm({
+              software: software,
+              licenseKey: licenseKey,
+              maxDevices: 10,
+              purchaseDate: "2026-09-18",
+              expirationDate: "2027-09-18",
+              adminEmail: "admin@example.com",
+              remarks: "Playwright Phase 2 automation test",
+              autoRenewal: false
+            }));
+
+          case 11:
+            _context11.next = 13;
+            return regeneratorRuntime.awrap(softwareLicensePage.saveLicense());
+
+          case 13:
+            _context11.next = 15;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifySuccessMessage());
+
+          case 15:
+            _context11.next = 17;
+            return regeneratorRuntime.awrap(softwareLicensePage.search(licenseKey));
+
+          case 17:
+            _context11.next = 19;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyLicenseExists(licenseKey));
+
+          case 19:
+          case "end":
+            return _context11.stop();
+        }
+      }
+    });
+  });
+  test("edits a software license and verifies persistence", function _callee12(_ref12) {
+    var softwareLicensePage, license, updatedRemarks;
+    return regeneratorRuntime.async(function _callee12$(_context12) {
+      while (1) {
+        switch (_context12.prev = _context12.next) {
+          case 0:
+            softwareLicensePage = _ref12.softwareLicensePage;
+            _context12.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.getFirstLicenseData());
+
+          case 3:
+            license = _context12.sent;
+            expect(license.softwareCode).toBeTruthy();
+            _context12.next = 7;
+            return regeneratorRuntime.awrap(softwareLicensePage.editLicenseByText(license.softwareName));
+
+          case 7:
+            _context12.next = 9;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyLicenseForm({
+              edit: true
+            }));
+
+          case 9:
+            updatedRemarks = "Updated by Playwright ".concat(Date.now());
+            _context12.next = 12;
+            return regeneratorRuntime.awrap(softwareLicensePage.fillLicenseForm({
+              remarks: updatedRemarks
+            }));
+
+          case 12:
+            _context12.next = 14;
+            return regeneratorRuntime.awrap(softwareLicensePage.updateLicense());
+
+          case 14:
+            _context12.next = 16;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifySuccessMessage());
+
+          case 16:
+            _context12.next = 18;
+            return regeneratorRuntime.awrap(softwareLicensePage.search(license.softwareCode));
+
+          case 18:
+            _context12.next = 20;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyLicenseExists(license.softwareCode));
+
+          case 20:
+          case "end":
+            return _context12.stop();
+        }
+      }
+    });
+  });
+  test("validates an empty software license form", function _callee13(_ref13) {
+    var softwareLicensePage;
+    return regeneratorRuntime.async(function _callee13$(_context13) {
+      while (1) {
+        switch (_context13.prev = _context13.next) {
+          case 0:
+            softwareLicensePage = _ref13.softwareLicensePage;
+            _context13.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.openAddLicenseForm());
+
+          case 3:
+            _context13.next = 5;
+            return regeneratorRuntime.awrap(softwareLicensePage.clearLicenseForm());
+
+          case 5:
+            _context13.next = 7;
+            return regeneratorRuntime.awrap(softwareLicensePage.saveLicense());
+
+          case 7:
+            _context13.next = 9;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyValidationMessage());
+
+          case 9:
+            _context13.next = 11;
+            return regeneratorRuntime.awrap(expect(softwareLicensePage.licenseTab).toBeVisible());
+
+          case 11:
+          case "end":
+            return _context13.stop();
+        }
+      }
+    });
+  });
+  test("validates invalid software license fields", function _callee14(_ref14) {
+    var softwareLicensePage, options, software;
+    return regeneratorRuntime.async(function _callee14$(_context14) {
+      while (1) {
+        switch (_context14.prev = _context14.next) {
+          case 0:
+            softwareLicensePage = _ref14.softwareLicensePage;
+            _context14.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.openAddLicenseForm());
+
+          case 3:
+            _context14.next = 5;
+            return regeneratorRuntime.awrap(softwareLicensePage.getSoftwareOptions());
+
+          case 5:
+            options = _context14.sent;
+            software = options.find(function (option) {
+              return option.trim() && !/select|choose/i.test(option);
+            });
+            expect(software).toBeTruthy();
+            _context14.next = 10;
+            return regeneratorRuntime.awrap(softwareLicensePage.fillLicenseForm({
+              software: software,
+              licenseKey: "INVALID",
+              maxDevices: -1,
+              purchaseDate: "2027-09-18",
+              expirationDate: "2026-09-18",
+              adminEmail: "invalid-email",
+              remarks: "Invalid field validation"
+            }));
+
+          case 10:
+            _context14.next = 12;
+            return regeneratorRuntime.awrap(softwareLicensePage.saveLicense());
+
+          case 12:
+            _context14.next = 14;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyValidationMessage());
+
+          case 14:
+          case "end":
+            return _context14.stop();
+        }
+      }
+    });
+  });
+  test("rejects a duplicate license key", function _callee15(_ref15) {
+    var softwareLicensePage, existingLicense, options, software;
+    return regeneratorRuntime.async(function _callee15$(_context15) {
+      while (1) {
+        switch (_context15.prev = _context15.next) {
+          case 0:
+            softwareLicensePage = _ref15.softwareLicensePage;
+            _context15.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.getFirstLicenseData());
+
+          case 3:
+            existingLicense = _context15.sent;
+            _context15.next = 6;
+            return regeneratorRuntime.awrap(softwareLicensePage.openAddLicenseForm());
+
+          case 6:
+            _context15.next = 8;
+            return regeneratorRuntime.awrap(softwareLicensePage.getSoftwareOptions());
+
+          case 8:
+            options = _context15.sent;
+            software = options.find(function (option) {
+              return option.trim() && !/select|choose/i.test(option);
+            });
+            expect(software).toBeTruthy();
+            _context15.next = 13;
+            return regeneratorRuntime.awrap(softwareLicensePage.fillLicenseForm({
+              software: software,
+              licenseKey: existingLicense.softwareCode,
+              maxDevices: 10,
+              purchaseDate: "2026-09-18",
+              expirationDate: "2027-09-18",
+              adminEmail: "admin@example.com",
+              remarks: "Duplicate license key validation"
+            }));
+
+          case 13:
+            _context15.next = 15;
+            return regeneratorRuntime.awrap(softwareLicensePage.saveLicense());
+
+          case 15:
+            _context15.next = 17;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyValidationMessage());
+
+          case 17:
+          case "end":
+            return _context15.stop();
+        }
+      }
+    });
+  });
+  test("validates duplicate software selection", function _callee16(_ref16) {
+    var softwareLicensePage, existingLicense, options, software;
+    return regeneratorRuntime.async(function _callee16$(_context16) {
+      while (1) {
+        switch (_context16.prev = _context16.next) {
+          case 0:
+            softwareLicensePage = _ref16.softwareLicensePage;
+            _context16.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.getFirstLicenseData());
+
+          case 3:
+            existingLicense = _context16.sent;
+            _context16.next = 6;
+            return regeneratorRuntime.awrap(softwareLicensePage.openAddLicenseForm());
+
+          case 6:
+            _context16.next = 8;
+            return regeneratorRuntime.awrap(softwareLicensePage.getSoftwareOptions());
+
+          case 8:
+            options = _context16.sent;
+            software = options.find(function (option) {
+              return option.trim() === existingLicense.softwareName.trim();
+            });
+            expect(software).toBeTruthy();
+            _context16.next = 13;
+            return regeneratorRuntime.awrap(softwareLicensePage.fillLicenseForm({
+              software: software,
+              licenseKey: "DUP-SOFTWARE-".concat(Date.now()),
+              maxDevices: 10,
+              purchaseDate: "2026-09-18",
+              expirationDate: "2027-09-18",
+              adminEmail: "admin@example.com",
+              remarks: "Duplicate software validation"
+            }));
+
+          case 13:
+            _context16.next = 15;
+            return regeneratorRuntime.awrap(softwareLicensePage.saveLicense());
+
+          case 15:
+            _context16.next = 17;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyValidationMessage());
+
+          case 17:
+          case "end":
+            return _context16.stop();
+        }
+      }
+    });
+  });
+  test("validates an expiration date earlier than the purchase date", function _callee17(_ref17) {
+    var softwareLicensePage, options, software;
+    return regeneratorRuntime.async(function _callee17$(_context17) {
+      while (1) {
+        switch (_context17.prev = _context17.next) {
+          case 0:
+            softwareLicensePage = _ref17.softwareLicensePage;
+            _context17.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.openAddLicenseForm());
+
+          case 3:
+            _context17.next = 5;
+            return regeneratorRuntime.awrap(softwareLicensePage.getSoftwareOptions());
+
+          case 5:
+            options = _context17.sent;
+            software = options.find(function (option) {
+              return option.trim() && !/select|choose/i.test(option);
+            });
+            expect(software).toBeTruthy();
+            _context17.next = 10;
+            return regeneratorRuntime.awrap(softwareLicensePage.fillLicenseForm({
+              software: software,
+              licenseKey: "EXPIRY-".concat(Date.now()),
+              maxDevices: 10,
+              purchaseDate: "2027-09-18",
+              expirationDate: "2026-09-18",
+              adminEmail: "admin@example.com",
+              remarks: "Expiration date validation"
+            }));
+
+          case 10:
+            _context17.next = 12;
+            return regeneratorRuntime.awrap(softwareLicensePage.saveLicense());
+
+          case 12:
+            _context17.next = 14;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyValidationMessage());
+
+          case 14:
+          case "end":
+            return _context17.stop();
+        }
+      }
+    });
+  });
+  test("verifies active license records", function _callee18(_ref18) {
+    var softwareLicensePage;
+    return regeneratorRuntime.async(function _callee18$(_context18) {
+      while (1) {
+        switch (_context18.prev = _context18.next) {
+          case 0:
+            softwareLicensePage = _ref18.softwareLicensePage;
+            _context18.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.selectFilterOption(softwareLicensePage.statusFilter, "In Use"));
+
+          case 3:
+            _context18.next = 5;
+            return regeneratorRuntime.awrap(expect(softwareLicensePage.rows().first()).toBeVisible());
+
+          case 5:
+          case "end":
+            return _context18.stop();
+        }
+      }
+    });
+  });
+  test("verifies expired license records when available", function _callee19(_ref19) {
+    var softwareLicensePage, expiredRows, rowCount;
+    return regeneratorRuntime.async(function _callee19$(_context19) {
+      while (1) {
+        switch (_context19.prev = _context19.next) {
+          case 0:
+            softwareLicensePage = _ref19.softwareLicensePage;
+            expiredRows = softwareLicensePage.rows().filter({
+              hasText: /Expired\s*\(/i
+            });
+            _context19.next = 4;
+            return regeneratorRuntime.awrap(expiredRows.count());
+
+          case 4:
+            rowCount = _context19.sent;
+
+            if (!(rowCount > 0)) {
+              _context19.next = 12;
+              break;
+            }
+
+            _context19.next = 8;
+            return regeneratorRuntime.awrap(expect(expiredRows.first()).toBeVisible());
+
+          case 8:
+            _context19.next = 10;
+            return regeneratorRuntime.awrap(expect(expiredRows.first()).toContainText(/Expired\s*\(/i));
+
+          case 10:
+            _context19.next = 14;
+            break;
+
+          case 12:
+            _context19.next = 14;
+            return regeneratorRuntime.awrap(expect(softwareLicensePage.licenseTab.getByText(/no\s*(results|records|data|licenses)\s*found/i)).toBeVisible());
+
+          case 14:
+          case "end":
+            return _context19.stop();
+        }
+      }
+    });
+  });
+  test("verifies non-expired license records when available", function _callee20(_ref20) {
+    var softwareLicensePage, rows, rowCount, nonExpiredCount, index, expirationText, nonExpiredRows;
+    return regeneratorRuntime.async(function _callee20$(_context20) {
+      while (1) {
+        switch (_context20.prev = _context20.next) {
+          case 0:
+            softwareLicensePage = _ref20.softwareLicensePage;
+            rows = softwareLicensePage.rows();
+            _context20.next = 4;
+            return regeneratorRuntime.awrap(rows.count());
+
+          case 4:
+            rowCount = _context20.sent;
+            nonExpiredCount = 0;
+            index = 0;
+
+          case 7:
+            if (!(index < rowCount)) {
+              _context20.next = 15;
+              break;
+            }
+
+            _context20.next = 10;
+            return regeneratorRuntime.awrap(rows.nth(index).locator("td").nth(2).innerText());
+
+          case 10:
+            expirationText = _context20.sent.trim();
+
+            if (!/Expired\s*\(/i.test(expirationText)) {
+              nonExpiredCount++;
+            }
+
+          case 12:
+            index++;
+            _context20.next = 7;
+            break;
+
+          case 15:
+            if (!(nonExpiredCount > 0)) {
+              _context20.next = 21;
+              break;
+            }
+
+            nonExpiredRows = rows.filter({
+              hasNotText: /Expired\s*\(/i
+            });
+            _context20.next = 19;
+            return regeneratorRuntime.awrap(expect(nonExpiredRows.first()).toBeVisible());
+
+          case 19:
+            _context20.next = 23;
+            break;
+
+          case 21:
+            _context20.next = 23;
+            return regeneratorRuntime.awrap(expect(softwareLicensePage.licenseTab.getByText(/no\s*(results|records|data|licenses)\s*found/i)).toBeVisible());
+
+          case 23:
+          case "end":
+            return _context20.stop();
+        }
+      }
+    });
+  });
+  test("opens edit form for an existing license and supports status transition fields", function _callee21(_ref21) {
+    var softwareLicensePage, fields;
+    return regeneratorRuntime.async(function _callee21$(_context21) {
+      while (1) {
+        switch (_context21.prev = _context21.next) {
+          case 0:
+            softwareLicensePage = _ref21.softwareLicensePage;
+            _context21.next = 3;
+            return regeneratorRuntime.awrap(softwareLicensePage.editFirstLicense());
+
+          case 3:
+            _context21.next = 5;
+            return regeneratorRuntime.awrap(softwareLicensePage.verifyLicenseForm({
+              edit: true
+            }));
+
+          case 5:
+            _context21.next = 7;
+            return regeneratorRuntime.awrap(softwareLicensePage.getFormFields());
+
+          case 7:
+            fields = _context21.sent;
+            _context21.next = 10;
+            return regeneratorRuntime.awrap(expect(fields.dates).toHaveCount(2));
+
+          case 10:
+            _context21.next = 12;
+            return regeneratorRuntime.awrap(expect(fields.autoRenewal).toBeVisible());
+
+          case 12:
+            _context21.next = 14;
+            return regeneratorRuntime.awrap(softwareLicensePage.cancelForm());
+
+          case 14:
+          case "end":
+            return _context21.stop();
         }
       }
     });

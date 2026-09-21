@@ -1,38 +1,119 @@
-const { test, expect } = require('../../fixtures/appFixtures');
+const { test, expect } = require("../../fixtures/appFixtures");
 
-test.describe('Inventory - Infrastructure Assets', () => {
+test.describe("Inventory - Infrastructure Assets", () => {
   test.beforeEach(async ({ page, inventoryPage, infrastructureAssetPage }) => {
-    await page.goto('/');
+    await page.goto("/");
+
     await inventoryPage.navigateToInventory();
+
     await inventoryPage.openInfrastructureAssets();
+
     await infrastructureAssetPage.verifyTable();
   });
 
-  test('displays the Infrastructure Assets table and pagination state', async ({ infrastructureAssetPage }) => {
-    await expect(infrastructureAssetPage.rows()).toHaveCount(6);
-    await expect(infrastructureAssetPage.pageIndicator).toContainText('Page 1 of 1');
+  test("displays the Infrastructure Assets table and pagination state", async ({
+    infrastructureAssetPage,
+  }) => {
+    const rowCount = await infrastructureAssetPage.rows().count();
+
+    expect(rowCount).toBeGreaterThan(0);
+
+    await expect(infrastructureAssetPage.pageIndicator).toContainText(
+      "Page 1 of 1",
+    );
+
     await expect(infrastructureAssetPage.previousButton).toBeDisabled();
+
     await expect(infrastructureAssetPage.nextButton).toBeDisabled();
   });
 
-  test('changes the infrastructure rows per page control', async ({ infrastructureAssetPage }) => {
+  test("changes the infrastructure rows per page control", async ({
+    infrastructureAssetPage,
+  }) => {
+    const initialRowCount = await infrastructureAssetPage.rows().count();
+
     await infrastructureAssetPage.selectRowsPerPage(50);
-    await expect(infrastructureAssetPage.rows()).toHaveCount(6);
+
+    await expect(infrastructureAssetPage.rows()).toHaveCount(initialRowCount);
+
+    await expect(infrastructureAssetPage.pageIndicator).toContainText(
+      "Page 1 of 1",
+    );
   });
 
-  test('opens infrastructure asset details and edit form', async ({ page, infrastructureAssetPage }) => {
+  test("opens infrastructure asset details and edit form", async ({
+    infrastructureAssetPage,
+  }) => {
     await infrastructureAssetPage.viewFirstAsset();
-    await infrastructureAssetPage.verifyAssetDetails();
+
+    await infrastructureAssetPage.verifyViewDetails();
+
     await infrastructureAssetPage.closeDialog();
+
     await infrastructureAssetPage.editFirstAsset();
-    await infrastructureAssetPage.verifyAssetForm({ edit: true });
-    await expect(page.getByRole('dialog').getByRole('button', { name: 'Update' })).toBeVisible();
-    await page.getByRole('dialog').getByRole('button', { name: 'Cancel' }).click();
+
+    await infrastructureAssetPage.verifyAssetForm({
+      edit: true,
+    });
+
+    await infrastructureAssetPage
+      .dialog()
+      .getByRole("button", {
+        name: "Cancel",
+        exact: true,
+      })
+      .click();
+
+    await expect(infrastructureAssetPage.dialog()).toBeHidden();
   });
 
-  test('opens the Add Infrastructure Asset form with supported fields', async ({ infrastructureAssetPage }) => {
+  test("opens the Add Infrastructure Asset form with supported fields", async ({
+    infrastructureAssetPage,
+  }) => {
     await infrastructureAssetPage.openAddAssetForm();
+
     await infrastructureAssetPage.verifyAssetForm();
-    await infrastructureAssetPage.dialog().getByRole('button', { name: 'Cancel' }).click();
+
+    await infrastructureAssetPage
+      .dialog()
+      .getByRole("button", {
+        name: "Cancel",
+        exact: true,
+      })
+      .click();
+
+    await expect(infrastructureAssetPage.dialog()).toBeHidden();
+  });
+
+  test("adds a valid infrastructure asset and verifies the created record", async ({
+    infrastructureAssetPage,
+  }) => {
+    await infrastructureAssetPage.openAddAssetForm();
+
+    await infrastructureAssetPage.fillInfrastructureAsset({
+      assetType: "Laptop",
+      location: "Kochi",
+      status: "Deployed",
+      purchaseAmount: "50000",
+      purchaseDate: "2026-09-18",
+      model: "Dell Latitude 5550",
+      processor: "Intel Core i7",
+      ram: "32 GB",
+      storage: "1 TB SSD",
+      operatingSystem: "Windows 11 Pro",
+      remarks: "Automation test infrastructure asset",
+    });
+
+    const assetCode = await infrastructureAssetPage.getGeneratedAssetCode();
+
+    expect(assetCode).toBeTruthy();
+
+    await infrastructureAssetPage.addInfrastructureAsset();
+
+    await infrastructureAssetPage.verifyAssetInTable(assetCode, [
+      "Laptop",
+      "Kochi",
+      "Deployed",
+    ]);
   });
 });

@@ -348,14 +348,22 @@ test.describe("User Management - Complete Test Suite", function () {
 
           case 7:
             _context14.next = 9;
-            return regeneratorRuntime.awrap(userManagementPage.getUserCount());
+            return regeneratorRuntime.awrap(expect.poll(function () {
+              return userManagementPage.getUserCount();
+            }, {
+              timeout: 10000,
+              intervals: [200, 500, 1000]
+            }).toBe(initialCount));
 
           case 9:
+            _context14.next = 11;
+            return regeneratorRuntime.awrap(userManagementPage.getUserCount());
+
+          case 11:
             finalCount = _context14.sent;
-            expect(finalCount).toBe(initialCount);
             expect(finalCount).toBeGreaterThan(0);
 
-          case 12:
+          case 13:
           case "end":
             return _context14.stop();
         }

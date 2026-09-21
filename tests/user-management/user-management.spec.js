@@ -133,11 +133,18 @@ test.describe("User Management - Complete Test Suite", () => {
     const initialCount = await userManagementPage.getUserCount();
 
     await userManagementPage.searchUser("Amrutha");
+
     await userManagementPage.clearSearch();
+
+    await expect
+      .poll(() => userManagementPage.getUserCount(), {
+        timeout: 10000,
+        intervals: [200, 500, 1000],
+      })
+      .toBe(initialCount);
 
     const finalCount = await userManagementPage.getUserCount();
 
-    expect(finalCount).toBe(initialCount);
     expect(finalCount).toBeGreaterThan(0);
   });
 

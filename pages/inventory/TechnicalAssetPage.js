@@ -50,7 +50,6 @@ class TechnicalAssetPage {
       exact: true,
     });
 
-    // Pagination buttons with numeric labels
     this.pageButtons = this.technicalTab.getByRole("button", {
       name: /^\d+$/,
     });
@@ -96,7 +95,6 @@ class TechnicalAssetPage {
     });
 
     await checkbox.check();
-
     await expect(checkbox).toBeChecked();
   }
 
@@ -139,6 +137,18 @@ class TechnicalAssetPage {
 
   formSelect(index) {
     return this.dialog().locator("select").nth(index);
+  }
+
+  assetTypeSelect() {
+    return this.formSelect(0);
+  }
+
+  locationSelect() {
+    return this.formSelect(1);
+  }
+
+  statusSelect() {
+    return this.formSelect(2);
   }
 
   async verifyAssetFormFields({ edit = false } = {}) {
@@ -233,6 +243,46 @@ class TechnicalAssetPage {
 
   assetCodeInput() {
     return this.dialog().getByPlaceholder("Auto-generated");
+  }
+
+  remarksInput() {
+    return this.dialog().getByPlaceholder("Additional notes about the asset");
+  }
+
+  async fillValidAssetData({
+    assetType,
+    model,
+    storage,
+    os,
+    ram,
+    processor,
+    purchaseAmount,
+    purchaseDate,
+    location,
+    status,
+    remarks,
+  }) {
+    await this.assetTypeSelect().selectOption({
+      label: assetType,
+    });
+
+    await this.modelInput().fill(model);
+    await this.storageInput().fill(storage);
+    await this.osInput().fill(os);
+    await this.ramInput().fill(ram);
+    await this.processorInput().fill(processor);
+    await this.purchaseAmountInput().fill(String(purchaseAmount));
+    await this.purchaseDateInput().fill(purchaseDate);
+
+    await this.locationSelect().selectOption({
+      label: location,
+    });
+
+    await this.statusSelect().selectOption({
+      label: status,
+    });
+
+    await this.remarksInput().fill(remarks);
   }
 
   async cancelDialog() {
@@ -404,6 +454,16 @@ class TechnicalAssetPage {
   async verifyHistory() {
     await expect(this.dialog()).toContainText("Asset History");
     await expect(this.dialog().getByRole("list")).toBeVisible();
+  }
+
+  async verifyAssetRow(assetCode, expectedData) {
+    const row = this.rowByAssetCode(assetCode);
+
+    await expect(row).toBeVisible();
+
+    for (const value of expectedData) {
+      await expect(row).toContainText(String(value));
+    }
   }
 }
 

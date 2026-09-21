@@ -1,18 +1,17 @@
-
 # Playwright
 node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-/playwright/.auth/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+playwright/.auth/
 
-/allure-results/
-/allure-report/
-/screenshots/
+allure-results/
+allure-report/
+screenshots/
 
 # Authentication and local configuration
-/auth/auth.json
+auth/auth.json
 .env
 .env.*
 !.env.example
@@ -27,5 +26,5 @@ Thumbs.db
 .vscode/
 
 # Local authentication and generated artifacts
-/README.md
-/dist/
+README.md
+dist/
