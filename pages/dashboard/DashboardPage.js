@@ -70,15 +70,15 @@ class DashboardPage {
   }
 
   async verifyDashboardLoaded() {
-    await expect(this.assetsTitle).toBeVisible({
+    await expect(this.page).toHaveURL(/\/(?:dashboard)?(?:\/)?$/, {
       timeout: 10000,
     });
 
-    await expect(this.requestTitle).toBeVisible({
+    await expect(this.userName).toBeVisible({
       timeout: 10000,
     });
 
-    await expect(this.notificationTitle).toBeVisible({
+    await expect(this.employeeId).toBeVisible({
       timeout: 10000,
     });
   }

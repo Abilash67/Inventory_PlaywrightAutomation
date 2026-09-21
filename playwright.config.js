@@ -1,5 +1,5 @@
 const { defineConfig, devices } = require("@playwright/test");
-const path = require("path");
+const path = require("node:path");
 const { getEnvironment } = require("./config/environments");
 
 const { baseURL } = getEnvironment();

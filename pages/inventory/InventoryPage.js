@@ -27,13 +27,8 @@ class InventoryPage {
 
     await this.page.waitForLoadState("domcontentloaded");
 
-    const inventoryMenu = this.page.getByRole("link", {
-      name: "Inventory",
-      exact: true,
-    });
-
-    if (await inventoryMenu.isVisible().catch(() => false)) {
-      await inventoryMenu.click();
+    if (await this.inventoryMenu.isVisible().catch(() => false)) {
+      await this.inventoryMenu.click();
     } else {
       await this.page.goto("/inventory", {
         waitUntil: "domcontentloaded",
@@ -75,4 +70,6 @@ class InventoryPage {
   }
 }
 
-module.exports = { InventoryPage };
+module.exports = {
+  InventoryPage,
+};

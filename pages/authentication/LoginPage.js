@@ -27,12 +27,13 @@ class LoginPage {
     });
 
     this.invalidCredentialsMessage = page.locator('div[id="1"]');
+
     this.notificationAlert = page.getByRole("alert");
   }
 
   async openApplication() {
     await this.page.goto(loginUrl, {
-      waitUntil: "domcontentloaded",
+      waitUntil: "commit",
       timeout: 30000,
     });
 

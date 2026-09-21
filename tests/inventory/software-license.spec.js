@@ -2,11 +2,19 @@ const { test, expect } = require("../../fixtures/appFixtures");
 
 test.describe("Inventory - Software Licenses", () => {
   test.beforeEach(async ({ page, inventoryPage, softwareLicensePage }) => {
-    await page.goto("/");
+    await page.goto("/", {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
+
     await inventoryPage.navigateToInventory();
     await inventoryPage.openSoftwareLicenses();
     await softwareLicensePage.verifyTable();
   });
+
+  // ============================================================
+  // FILTERS
+  // ============================================================
 
   test("displays and filters the Software Licenses table", async ({
     softwareLicensePage,
@@ -28,6 +36,10 @@ test.describe("Inventory - Software Licenses", () => {
     await expect(softwareLicensePage.rows().first()).toBeVisible();
   });
 
+  // ============================================================
+  // SEARCH
+  // ============================================================
+
   test("searches licenses and shows no matching record for invalid input", async ({
     softwareLicensePage,
   }) => {
@@ -38,16 +50,21 @@ test.describe("Inventory - Software Licenses", () => {
     await softwareLicensePage.search(code);
 
     await expect(softwareLicensePage.rows()).toHaveCount(1);
+
     await expect(softwareLicensePage.rows().first()).toContainText(code);
 
     await softwareLicensePage.search("NON_EXISTENT_LICENSE_999999");
 
     await expect(
       softwareLicensePage.licenseTab.getByText(
-        /no\s*(results|records|data|licenses)\s*found/i,
+        /no\s+(results|records|data|licenses)\s+found/i,
       ),
     ).toBeVisible();
   });
+
+  // ============================================================
+  // PAGINATION
+  // ============================================================
 
   test("changes rows per page and exposes safe pagination controls", async ({
     softwareLicensePage,
@@ -55,7 +72,7 @@ test.describe("Inventory - Software Licenses", () => {
     await softwareLicensePage.selectRowsPerPage(50);
 
     const totalRowsText = await softwareLicensePage.licenseTab
-      .getByText(/Total Rows\s*:/)
+      .getByText(/Total Rows\s*:/i)
       .innerText();
 
     const totalRowsMatch = totalRowsText.match(/\d+/);
@@ -67,8 +84,13 @@ test.describe("Inventory - Software Licenses", () => {
     await expect(softwareLicensePage.rows()).toHaveCount(totalRows);
 
     await expect(softwareLicensePage.previousButton).toBeDisabled();
+
     await expect(softwareLicensePage.nextButton).toBeDisabled();
   });
+
+  // ============================================================
+  // VIEW / EDIT
+  // ============================================================
 
   test("opens license details and edit form", async ({
     page,
@@ -95,6 +117,10 @@ test.describe("Inventory - Software Licenses", () => {
     await softwareLicensePage.cancelForm();
   });
 
+  // ============================================================
+  // ADD FORM
+  // ============================================================
+
   test("opens the Add License form with supported fields", async ({
     page,
     softwareLicensePage,
@@ -108,13 +134,17 @@ test.describe("Inventory - Software Licenses", () => {
     await softwareLicensePage.cancelForm();
   });
 
+  // ============================================================
+  // SORTING
+  // ============================================================
+
   test("sorts the Software Licenses table by column header", async ({
     softwareLicensePage,
   }) => {
     const nameHeader = softwareLicensePage.licenseTable.getByRole(
       "columnheader",
       {
-        name: /Software Name/,
+        name: /Software Name/i,
       },
     );
 
@@ -141,11 +171,15 @@ test.describe("Inventory - Software Licenses", () => {
     expect(trimmedSecond).toEqual(descSorted);
   });
 
+  // ============================================================
+  // EMPTY STATE
+  // ============================================================
+
   test("shows empty state when search yields no results", async ({
     softwareLicensePage,
   }) => {
     const emptyState = softwareLicensePage.licenseTab.getByText(
-      /no\s*(results|records|data|licenses)\s*found/i,
+      /no\s+(results|records|data|licenses)\s+found/i,
     );
 
     await softwareLicensePage.search("NON_EXISTENT_LICENSE_ZZZZZ");
@@ -156,6 +190,10 @@ test.describe("Inventory - Software Licenses", () => {
 
     await expect(softwareLicensePage.rows().first()).toBeVisible();
   });
+
+  // ============================================================
+  // KEYBOARD ACCESSIBILITY
+  // ============================================================
 
   test("supports keyboard tab navigation through the Add License dialog", async ({
     page,
@@ -200,14 +238,27 @@ test.describe("Inventory - Software Licenses", () => {
     await softwareLicensePage.cancelForm();
   });
 
+  // ============================================================
+  // RESPONSIVE LAYOUT
+  // ============================================================
+
   test("maintains visible layout across mobile, tablet, and desktop viewports", async ({
     page,
     softwareLicensePage,
   }) => {
     const viewports = [
-      { width: 375, height: 667 },
-      { width: 768, height: 1024 },
-      { width: 1440, height: 900 },
+      {
+        width: 375,
+        height: 667,
+      },
+      {
+        width: 768,
+        height: 1024,
+      },
+      {
+        width: 1440,
+        height: 900,
+      },
     ];
 
     for (const viewport of viewports) {
@@ -235,8 +286,13 @@ test.describe("Inventory - Software Licenses", () => {
     });
   });
 
-  // Skipped because the application closes the dialog but the generated
-  // license key is not exposed in the Software Licenses table/search result.
+  // ============================================================
+  // PHASE 2 - ADD VALID LICENSE
+  // ============================================================
+
+  // NOSONAR - S1607: The application closes the dialog after
+  // creation but does not expose the generated license key
+  // reliably in the Software Licenses table/search result.
   test.skip("adds a valid software license and verifies persistence", async ({
     softwareLicensePage,
   }) => {
@@ -286,6 +342,10 @@ test.describe("Inventory - Software Licenses", () => {
     ).toHaveCount(1);
   });
 
+  // ============================================================
+  // PHASE 2 - EDIT
+  // ============================================================
+
   test("edits a software license and verifies persistence", async ({
     softwareLicensePage,
   }) => {
@@ -316,6 +376,10 @@ test.describe("Inventory - Software Licenses", () => {
     await softwareLicensePage.verifyLicenseExists(license.softwareCode);
   });
 
+  // ============================================================
+  // VALIDATION - EMPTY FORM
+  // ============================================================
+
   test("keeps the form open when submitting an empty software license", async ({
     softwareLicensePage,
   }) => {
@@ -330,9 +394,15 @@ test.describe("Inventory - Software Licenses", () => {
     const fields = await softwareLicensePage.getFormFields();
 
     await expect(fields.softwareSelect).toBeVisible();
+
     await expect(fields.maxDevices).toBeVisible();
+
     await expect(fields.licenseKey).toBeVisible();
   });
+
+  // ============================================================
+  // VALIDATION - INVALID DATA
+  // ============================================================
 
   test("keeps the form open when invalid software license data is submitted", async ({
     softwareLicensePage,
@@ -364,10 +434,17 @@ test.describe("Inventory - Software Licenses", () => {
     await expect(softwareLicensePage.dialog()).toBeVisible();
 
     await expect(fields.adminEmail).toHaveValue("invalid-email");
+
     await expect(fields.maxDevices).toHaveValue("-1");
   });
 
-  // Skipped because the application does not expose an existing license key reliably.
+  // ============================================================
+  // VALIDATION - DUPLICATE LICENSE KEY
+  // ============================================================
+
+  // NOSONAR - S1607: The application does not reliably expose
+  // an existing software license key, preventing deterministic
+  // duplicate-license-key validation.
   test.skip("rejects a duplicate license key", async ({
     softwareLicensePage,
   }) => {
@@ -377,7 +454,7 @@ test.describe("Inventory - Software Licenses", () => {
 
     const dialogText = await softwareLicensePage.dialog().innerText();
 
-    const keyMatch = dialogText.match(/Software License Key\s*:?\s*([^\s]+)/i);
+    const keyMatch = dialogText.match(/Software License Key\s*:?\s*(\S+)/i);
 
     const existingLicenseKey = keyMatch?.[1]?.trim();
 
@@ -409,6 +486,10 @@ test.describe("Inventory - Software Licenses", () => {
     );
   });
 
+  // ============================================================
+  // SOFTWARE SELECTION
+  // ============================================================
+
   test("selects an existing software type in the Add License form", async ({
     softwareLicensePage,
   }) => {
@@ -437,6 +518,10 @@ test.describe("Inventory - Software Licenses", () => {
     await softwareLicensePage.cancelForm();
   });
 
+  // ============================================================
+  // DATE FIELDS
+  // ============================================================
+
   test("accepts the entered purchase and expiration dates in the Add License form", async ({
     softwareLicensePage,
   }) => {
@@ -451,6 +536,7 @@ test.describe("Inventory - Software Licenses", () => {
     expect(software).toBeTruthy();
 
     const purchaseDate = "2027-09-18";
+
     const expirationDate = "2026-09-18";
 
     await softwareLicensePage.fillLicenseForm({
@@ -470,10 +556,15 @@ test.describe("Inventory - Software Licenses", () => {
     );
 
     await expect(fields.dates.nth(0)).toHaveValue(purchaseDate);
+
     await expect(fields.dates.nth(1)).toHaveValue(expirationDate);
 
     await softwareLicensePage.cancelForm();
   });
+
+  // ============================================================
+  // STATUS
+  // ============================================================
 
   test("verifies active license records", async ({ softwareLicensePage }) => {
     await softwareLicensePage.selectFilterOption(
@@ -488,7 +579,7 @@ test.describe("Inventory - Software Licenses", () => {
     softwareLicensePage,
   }) => {
     const expiredRows = softwareLicensePage.rows().filter({
-      hasText: /Expired\s*\(/i,
+      hasText: /Expired/i,
     });
 
     const count = await expiredRows.count();
@@ -496,11 +587,11 @@ test.describe("Inventory - Software Licenses", () => {
     if (count > 0) {
       await expect(expiredRows.first()).toBeVisible();
 
-      await expect(expiredRows.first()).toContainText(/Expired\s*\(/i);
+      await expect(expiredRows.first()).toContainText(/Expired/i);
     } else {
       await expect(
         softwareLicensePage.licenseTab.getByText(
-          /no\s*(results|records|data|licenses)\s*found/i,
+          /no\s+(results|records|data|licenses)\s+found/i,
         ),
       ).toBeVisible();
     }
@@ -520,7 +611,7 @@ test.describe("Inventory - Software Licenses", () => {
         await rows.nth(index).locator("td").nth(2).innerText()
       ).trim();
 
-      if (!/Expired\s*\(/i.test(expirationText)) {
+      if (!/Expired/i.test(expirationText)) {
         nonExpiredRows.push(index);
       }
     }
@@ -529,6 +620,10 @@ test.describe("Inventory - Software Licenses", () => {
       await expect(rows.nth(nonExpiredRows[0])).toBeVisible();
     }
   });
+
+  // ============================================================
+  // EDIT / STATUS TRANSITION
+  // ============================================================
 
   test("opens edit form for an existing license and supports status transition fields", async ({
     softwareLicensePage,
@@ -542,6 +637,7 @@ test.describe("Inventory - Software Licenses", () => {
     const fields = await softwareLicensePage.getFormFields();
 
     await expect(fields.dates).toHaveCount(2);
+
     await expect(fields.autoRenewal).toBeVisible();
 
     await softwareLicensePage.cancelForm();

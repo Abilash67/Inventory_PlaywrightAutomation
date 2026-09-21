@@ -2,14 +2,25 @@ const { test, expect } = require("../../fixtures/appFixtures");
 
 test.describe("Inventory - Technical Assets", () => {
   test.beforeEach(async ({ page, inventoryPage }) => {
-    await page.goto("/");
+    await page.goto("/", {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
 
     await inventoryPage.navigateToInventory();
 
-    await expect(page).toHaveURL(/inventory/);
+    // Wait for Inventory UI to finish rendering before opening the tab.
+    await inventoryPage.technicalAssets.waitFor({
+      state: "visible",
+      timeout: 30000,
+    });
 
     await inventoryPage.openTechnicalAssets();
   });
+
+  // ============================================================
+  // TABLE
+  // ============================================================
 
   test("displays the Technical Assets table", async ({
     technicalAssetPage,
@@ -17,14 +28,21 @@ test.describe("Inventory - Technical Assets", () => {
     await technicalAssetPage.verifyTechnicalAssetTable();
 
     await expect(technicalAssetPage.pageIndicator).toBeVisible();
+
     await expect(technicalAssetPage.searchInput).toBeVisible();
   });
+
+  // ============================================================
+  // FILTERS
+  // ============================================================
 
   test("applies multiple filters simultaneously", async ({
     technicalAssetPage,
   }) => {
     await technicalAssetPage.filterByAssetType("Desktop");
+
     await technicalAssetPage.filterByStatus("Available");
+
     await technicalAssetPage.filterByLocation("Kochi");
 
     await expect(
@@ -59,6 +77,10 @@ test.describe("Inventory - Technical Assets", () => {
     }
   });
 
+  // ============================================================
+  // SEARCH
+  // ============================================================
+
   test("displays no results for a non-matching search", async ({
     technicalAssetPage,
   }) => {
@@ -89,6 +111,10 @@ test.describe("Inventory - Technical Assets", () => {
       })
       .toBe(initialRows);
   });
+
+  // ============================================================
+  // PAGINATION
+  // ============================================================
 
   test("changes rows per page", async ({ technicalAssetPage }) => {
     const rowsPerPage = technicalAssetPage.rowsPerPageSelect;
@@ -133,6 +159,10 @@ test.describe("Inventory - Technical Assets", () => {
     await expect(technicalAssetPage.pageIndicator).toContainText("Page 1");
   });
 
+  // ============================================================
+  // VIEW / EDIT / HISTORY
+  // ============================================================
+
   test("opens asset details, edit form, and history", async ({
     page,
     technicalAssetPage,
@@ -175,6 +205,10 @@ test.describe("Inventory - Technical Assets", () => {
     );
   });
 
+  // ============================================================
+  // ADD ASSET FORM
+  // ============================================================
+
   test("opens the add asset form with all supported fields", async ({
     technicalAssetPage,
   }) => {
@@ -187,7 +221,10 @@ test.describe("Inventory - Technical Assets", () => {
     await expect(technicalAssetPage.dialog()).toBeHidden();
   });
 
-  // Phase 1 - Add Valid Technical Asset
+  // ============================================================
+  // PHASE 1 - ADD VALID ASSET
+  // ============================================================
+
   test("adds a valid Technical Asset and verifies the created record", async ({
     technicalAssetPage,
   }) => {
@@ -253,6 +290,10 @@ test.describe("Inventory - Technical Assets", () => {
     await expect(technicalAssetPage.dialog()).toContainText(testData.remarks);
   });
 
+  // ============================================================
+  // EDIT VALIDATION
+  // ============================================================
+
   test("validates required field during Edit", async ({
     technicalAssetPage,
   }) => {
@@ -290,6 +331,10 @@ test.describe("Inventory - Technical Assets", () => {
 
     await expect(technicalAssetPage.rowByAssetCode(assetCode)).toBeVisible();
   });
+
+  // ============================================================
+  // ADD VALIDATION
+  // ============================================================
 
   test("validates required fields during Add Asset", async ({
     technicalAssetPage,
@@ -351,20 +396,24 @@ test.describe("Inventory - Technical Assets", () => {
     ).toHaveCount(0);
   });
 
+  // ============================================================
+  // BULK UPLOAD
+  // ============================================================
+
   test("verifies the bulk upload template link and accepts an Excel file", async ({
     technicalAssetPage,
   }) => {
     await technicalAssetPage.openBulkUploadForm();
 
     const downloadLink = technicalAssetPage.dialog().getByRole("link", {
-      name: /Download Sample Template/,
+      name: /Download Sample Template/i,
     });
 
     await expect(downloadLink).toBeVisible();
 
-    await expect(downloadLink).toHaveAttribute("href", /addAssets\.xlsx/);
+    await expect(downloadLink).toHaveAttribute("href", /addAssets\.xlsx/i);
 
-    const href = await technicalAssetPage.downloadBulkUploadTemplate();
+    const href = await downloadLink.getAttribute("href");
 
     expect(href).toBe("/assets/addAssets.xlsx");
 

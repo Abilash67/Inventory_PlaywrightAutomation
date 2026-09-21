@@ -32,6 +32,12 @@ class InfrastructureAssetPage {
     return this.assetTable.getByRole("rowgroup").nth(1).getByRole("row");
   }
 
+  rowByAssetCode(assetCode) {
+    return this.rows().filter({
+      hasText: assetCode,
+    });
+  }
+
   dialog() {
     return this.page.getByRole("dialog").last();
   }
@@ -184,13 +190,7 @@ class InfrastructureAssetPage {
 
     await this.verifyAssetDetails();
 
-    let buttonName;
-
-    if (edit) {
-      buttonName = "Update";
-    } else {
-      buttonName = "Create";
-    }
+    const buttonName = edit ? "Update" : "Create";
 
     await expect(
       dialog.getByRole("button", {
@@ -281,7 +281,11 @@ class InfrastructureAssetPage {
       })
       .not.toBe("");
 
-    return assetCodeField.inputValue();
+    const assetCode = await assetCodeField.inputValue();
+
+    expect(assetCode).toBeTruthy();
+
+    return assetCode;
   }
 
   async addInfrastructureAsset() {
@@ -307,9 +311,7 @@ class InfrastructureAssetPage {
   }
 
   async verifyAssetInTable(assetCode, expectedValues = []) {
-    const row = this.rows().filter({
-      hasText: assetCode,
-    });
+    const row = this.rowByAssetCode(assetCode);
 
     await expect(row).toHaveCount(1);
 
