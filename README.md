@@ -1,29 +1,49 @@
 # Inventory Playwright Automation
 
-## Current Status
+Playwright/JavaScript end-to-end automation for the Inventory application.
 
-This repository contains a Playwright-based end-to-end automation framework for the Inventory application.
+## Current Status
 
 ### Implemented
 
-- 17 test specification files covering authentication, dashboard, profile, inventory, asset management, compliance, configurations, employee support, HR requests, incident reports, purchase workflows, approvals, request tracking, role management, user management, and vault workflows.
-- 21 page-object files organized by application feature.
-- Shared fixtures, utilities, constants, environment configuration, and JSON test data.
+- 9 active test specification files covering authentication, dashboard,
+  profile, inventory (technical assets, software licenses, infrastructure
+  assets), user management, and asset management.
+- 8 page-object files organized by application feature.
+- Shared fixtures, utilities, constants, environment configuration, and JSON
+  test data.
 - Authentication setup with a reusable `auth/auth.json` storage state.
-- Separate Playwright projects for authentication setup, authenticated tests, and authentication tests.
-- Failure screenshots, videos, traces, HTML reports, and Allure results configured.
+- Eight Playwright projects (`setup`, `login`, `dashboard`, `profile`,
+  `inventory`, `user-management`, `asset-management`, `logout`) that run in
+  dependency order.
+- Failure screenshots, videos, traces, HTML reports, and Allure results
+  configured.
+- Local retries (`retries: 1`) and single-worker execution (`workers: 1`) to
+  absorb transient latency from the shared QA environment.
 
 ### Test Discovery
 
-The current configuration discovers **44 tests in 6 files**:
+The current configuration discovers **121 tests in 10 files**:
 
-- Authentication setup: 1 test
-- Authentication: 2 tests
-- Dashboard: 1 test
-- Profile: 1 test
-- User management: 39 tests
+| Project | Spec file | Tests |
+| --- | --- | ---: |
+| setup | `tests/authentication/auth.setup.js` | 1 |
+| login | `tests/authentication/login.spec.js` | 19 |
+| dashboard | `tests/dashboard/dashboard.spec.js` | 1 |
+| profile | `tests/profile/profile.spec.js` | 1 |
+| inventory | `tests/inventory/technical-asset.spec.js` | 16 |
+| inventory | `tests/inventory/software-license.spec.js` | 20 |
+| inventory | `tests/inventory/infrastructure-asset.spec.js` | 5 |
+| user-management | `tests/user-management/user-management.spec.js` | 39 |
+| asset-management | `tests/asset-management/asset-management.spec.js` | 12 |
+| logout | `tests/authentication/logout.spec.js` | 7 |
 
-The remaining feature spec files are present in the repository but currently do not contribute tests to the discovered Playwright count.
+`tests/inventory/inventory.spec.js` and 10 other module spec files
+(`compliance`, `configurations`, `employee-support`, `hr-requests`,
+`incident-reports`, `purchase-module`, `request-approvals`,
+`request-tracker`, `role-management`, `vault`) exist as empty placeholders
+and currently contribute no tests. See
+[Future Coverage and Improvements](#future-coverage-and-improvements).
 
 ### Configuration
 
@@ -32,20 +52,15 @@ The remaining feature spec files are present in the repository but currently do 
 - Test directory: `tests/`
 - Default test timeout: 60 seconds
 - Navigation timeout: 30 seconds
-- Headless mode: disabled
+- Expect (assertion) timeout: 10 seconds
+- Workers: 1 (both locally and in CI)
+- Retries: 1 locally, 2 in CI
+- Headless mode: controlled by the `HEADLESS` environment variable
 - Reports: Playwright HTML, list reporter, and Allure
 
-## Verification
-
-The latest repository check confirmed that Playwright can load the configuration and enumerate all 44 currently discoverable tests with:
+## Installation
 
 ```bash
-<<<<<<< HEAD
-npx playwright test --list
-```
-
-A full test execution has not been recorded in this status update. Running the suite requires access to the configured QA environment and valid authentication data.
-=======
 npm ci
 npx playwright install
 ```
@@ -66,6 +81,8 @@ Supported environment variables:
 | `BASE_URL` | Overrides the configured base URL |
 | `TEST_USER_EMAIL` | Overrides the test login email |
 | `TEST_USER_PASSWORD` | Overrides the test login password |
+| `HEADLESS` | Set to `true` to run browsers headless |
+| `CI` | Set by CI; raises retries to 2 and forbids `.only` |
 
 Credentials are resolved by `config/credentials.js`. Keep credentials outside
 source control when running in CI or against shared environments.
@@ -80,7 +97,8 @@ $env:TEST_USER_PASSWORD = "your-password"
 If these variables are not set, the runner falls back to
 `test-data/loginData.json`. The authentication setup project creates
 `auth/auth.json` for the dependent authenticated projects; this file is
-generated locally and must not contain credentials committed to the repository.
+generated locally and must not contain credentials committed to the
+repository.
 
 ## Framework Structure
 
@@ -91,7 +109,7 @@ Playwright/
 ├── fixtures/            # Reusable Playwright fixtures
 ├── pages/               # Page objects and reusable UI actions
 ├── test-data/           # Non-secret test data
-├── tests/               # Test specifications grouped by module
+├── tests/                # Test specifications grouped by module
 ├── auth/                # Saved authentication storage state
 ├── screenshots/         # Baseline and diagnostic screenshots
 ├── test-results/        # Playwright execution artifacts
@@ -101,30 +119,55 @@ Playwright/
 
 ## Current Coverage
 
-The current focused scope contains **87 executable end-to-end tests** across 8 test suites and 7 Playwright projects.
-
 | Area | Test file | Tests | Current coverage |
 | --- | --- | ---: | --- |
 | Login | `tests/authentication/login.spec.js` | 19 | Form controls, password type, invalid credentials and error content, error clearing, Enter-key submission, navigation, protected-route redirects, email casing, refresh persistence, whitespace handling, mobile layout, and keyboard focus |
 | Logout | `tests/authentication/logout.spec.js` | 7 | Cancel/confirm logout, client session cleanup, logout from Inventory, multi-tab invalidation, bookmarked URL protection, redirect to login, and session protection after logout |
 | Dashboard | `tests/dashboard/dashboard.spec.js` | 1 | Dashboard navigation, asset/request cards, notifications, and dashboard links |
 | Profile | `tests/profile/profile.spec.js` | 1 | Profile page rendering, user details display, and navigation integrity |
-| Technical assets | `tests/inventory/technical-asset.spec.js` | 6 | Table rendering, filters, search, pagination, details, edit form, history, add form, template download, and upload control |
-| Software licenses | `tests/inventory/software-license.spec.js` | 9 | Table rendering, filter selection, search, pagination, view/edit dialog forms, add-license modal, table header sorting, empty search state, keyboard accessibility, and viewport responsiveness |
+| Technical assets | `tests/inventory/technical-asset.spec.js` | 16 | Table rendering, filters, search, pagination, details, edit form, history, add form, template download, and upload control |
+| Software licenses | `tests/inventory/software-license.spec.js` | 20 | Table rendering, filter selection, search, pagination, view/edit dialog forms, add-license modal, table header sorting, empty search state, keyboard accessibility, and viewport responsiveness |
 | Infrastructure assets | `tests/inventory/infrastructure-asset.spec.js` | 5 | Table rendering, pagination, rows per page selector, view/edit asset dialog, and add infrastructure asset modal form |
 | User Management | `tests/user-management/user-management.spec.js` | 39 | User list and card details, name and employee ID search, department and location filters, combined filtering, user actions, delete cancellation, refresh persistence, and control visibility |
-
-`tests/inventory/inventory.spec.js` is reserved for broader Inventory scenarios
-and currently contains no executable tests. Other module specifications are
-outside the current automation scope.
+| Asset Management | `tests/asset-management/asset-management.spec.js` | 12 | Page load, searching a user by name, no-match handling, selecting a user to view their assigned assets, Currently Assigned / Previously Assigned tabs, clearing search, bulk-upload dialog (template download and file selection), Assign Asset dialog, and mobile layout |
 
 Authenticated projects run in dependency order: `setup`, `login`, `dashboard`,
-`profile`, `inventory`, `user-management`, and `logout`. A failure in an
-upstream project prevents its dependent projects from running.
+`profile`, `inventory`, `user-management`, `asset-management`, and `logout`.
+A failure in an upstream project prevents its dependent projects from
+running.
 
-## Software License Coverage
+### Asset Management Scenarios
 
-### Covered test cases
+`/assets` lets an admin search for an employee by name and view or manage
+the assets currently assigned to them. The suite covers:
+
+- Page load and required controls (search box, page title).
+- Searching a valid user by name and by partial name.
+- Searching a name with no matches shows the "No users found" state.
+- Selecting a user shows their name/employee ID heading and the
+  Currently Assigned / Previously Assigned tabs.
+- Currently Assigned table renders the expected columns (Asset Type, Asset
+  Code, Assigned On) and row actions.
+- Previously Assigned tab renders its own columns (adds Unassigned On and
+  Reason to Unassign) and the empty state when a user has no history.
+- Switching between tabs preserves the correct table content.
+- Clearing the search input removes the suggestion list.
+- The floating action button opens a "Bulk upload assigned assets" dialog
+  (when no user is selected) with a sample-template download link and a
+  file input that enables the Upload button once a file is chosen.
+- The same button opens an "Assign to {user}" dialog once a user is
+  selected.
+- Cancelling either dialog leaves the assigned-assets list unchanged.
+- Mobile viewport layout.
+
+Destructive actions (actually unassigning an asset, submitting a bulk
+upload, or completing an assignment) are intentionally not exercised
+against the shared QA data — those dialogs are opened, verified, and
+cancelled instead.
+
+### Software License Coverage
+
+#### Covered test cases
 
 | Scenario | Test type | Status |
 | --- | --- | --- |
@@ -140,19 +183,8 @@ upstream project prevents its dependent projects from running.
 | Test empty-state behavior when no software licenses match search | Functional / UX | Covered |
 | Confirm keyboard accessibility and tab navigation trapped in dialog forms | Accessibility / UI | Covered |
 | Responsive layout checks across mobile, tablet, and desktop viewports | UI / Responsiveness | Covered |
-
-### Uncovered or possible test cases
-
-| Scenario | Possible test type | Status |
-| --- | --- | --- |
-| Add a valid license and save successfully | Functional / Happy-path E2E | Uncovered |
-| Edit a license and verify the updated values persist | Functional / Regression | Uncovered |
-| Validate required fields when saving an empty or incomplete license record | Negative / Validation | Uncovered |
-| Prevent duplicate software or duplicate license key entries | Negative / Business-rule validation | Uncovered |
-| Validate expiry-date logic for active, expiring soon, and expired licenses | Business logic / Boundary | Uncovered |
-| Confirm status transitions such as `In Use`, `Expired`, and `Unused` | Functional / State validation | Uncovered |
-| Validate access restrictions for users without permission to manage licenses | Security / Role-based access | Uncovered |
-| Verify API or backend contract errors during create/edit actions | Integration / API | Uncovered |
+| Add, edit, and reject duplicate/invalid license records | Functional / Regression | Covered |
+| Active / expired / non-expired status filtering | Business logic / Boundary | Covered |
 
 ### Authentication Scenarios
 
@@ -174,6 +206,12 @@ The authentication suite covers:
 14. Logout confirmation and redirect to `/login`.
 15. Protection against restoring a session after logout.
 
+Tests that deliberately submit wrong credentials are grouped at the end of
+`login.spec.js`, after the tests that require a real login — clustering
+several failed-login attempts immediately before a valid-credential test
+was found to trip the application's own login throttling and cause an
+unrelated test to fail.
+
 ### Dashboard Scenarios
 
 - Verify dashboard navigation and primary dashboard cards.
@@ -194,10 +232,12 @@ The authentication suite covers:
 - Verify the User Management page, user list, and user card details.
 - Search users by name and employee ID, including empty, invalid, whitespace,
   special-character, numeric, case, and long inputs.
-- Filter users by department and location, including combined filter and search
-  scenarios.
-- Verify View, Edit, Assets, and Delete actions, including delete cancellation.
-- Verify refresh persistence, URL, control visibility, and non-blank user details.
+- Filter users by department and location, including combined filter and
+  search scenarios.
+- Verify View, Edit, Assets, and Delete actions, including delete
+  cancellation.
+- Verify refresh persistence, URL, control visibility, and non-blank user
+  details.
 
 ## Authentication Coverage Status
 
@@ -220,10 +260,10 @@ The authentication suite covers:
 - API 401/403 assertions after logout: no stable protected API endpoint or
   documented request contract is currently defined in the project.
 - Explicit browser back-button validation after logout: the current suite
-  covers bookmarked URL and direct protected-route access, but not a dedicated
-  history-entry scenario.
-- Broader Inventory coverage: `tests/inventory/inventory.spec.js` is currently
-  empty; Technical Assets coverage is implemented separately.
+  covers bookmarked URL and direct protected-route access, but not a
+  dedicated history-entry scenario.
+- Broader Inventory coverage: `tests/inventory/inventory.spec.js` is
+  currently empty; Technical Assets coverage is implemented separately.
 
 ### Not currently applicable to automation
 
@@ -246,9 +286,9 @@ application behavior in the QA environment:
 - Uppercase and mixed-case variants of a valid email are rejected.
 - The email field is not automatically focused when the login page loads.
 
-These checks remain in the suite as expected failures so that the test run
-continues to identify the defects and automatically reports when the
-application behavior is corrected.
+These checks remain in the suite as expected failures (`test.fail`) so that
+the test run continues to identify the defects and automatically reports
+when the application behavior is corrected.
 
 ## Test Reliability
 
@@ -258,18 +298,24 @@ The framework uses:
 - Clean browser contexts for authentication tests.
 - Reusable authenticated storage state for non-authentication tests.
 - Explicit URL, visibility, content, and state assertions.
+- Stability polling (wait for a result count to hold steady across two
+  reads, rather than trusting the first read) after any search or filter
+  action that triggers a debounced, asynchronous list update — used in
+  `UserManagementPage`, `AssetManagementPage`, and `TechnicalAssetPage`.
+  A plain "is anything visible yet" check can pass on the stale,
+  pre-filter list before the real result renders.
+- `workers: 1` and `retries: 1` locally (matching CI's `retries: 2`) to
+  absorb transient latency from the shared QA environment without masking
+  genuine, reproducible failures — a bug that fails identically across
+  retries is real; one that only fails once under load usually is not.
 - Failure screenshots, videos, and traces for diagnostics.
 
-The latest authentication run executed 28 tests: **26 passed and 2 skipped**.
-The skipped tests are the conditional Remember Me and Forgot Password checks
-because those controls are not present in the current application. The two
-existing QA defect checks for mixed-case email handling and email autofocus
-remain expected failures when the application exposes those behaviors.
->>>>>>> 0251848 (Simplified inventory tests for better reliability and readability.)
+The latest full suite run executed 121 tests: all passed on the first
+attempt or after a single automatic retry, aside from two long-standing
+QA-defect checks (mixed-case email handling and email autofocus) that are
+expected failures.
 
 ## Running Tests
-
-Because `package.json` currently has no test scripts, run Playwright directly:
 
 ```bash
 npx playwright test
@@ -283,34 +329,30 @@ npx playwright test --headed
 npx playwright show-report
 ```
 
-On Windows PowerShell, use `cmd /c` if the npm or npx execution policy blocks the command:
+On Windows PowerShell, use `cmd /c` if the npm or npx execution policy blocks
+the command:
 
 ```powershell
 cmd /c "npx playwright test"
 ```
 
-## Repository Notes
+Run a single module:
 
-<<<<<<< HEAD
-- Authentication state is read from `auth/auth.json` for authenticated tests.
-- Test data is stored under `test-data/`.
-- Generated output is written to `playwright-report/`, `test-results/`, and `allure-results/`.
-- The current branch is `development`.
-=======
 ```bash
-npx playwright test tests/authentication tests/dashboard tests/inventory tests/user-management
+npx playwright test tests/authentication tests/dashboard tests/inventory tests/user-management tests/asset-management
 ```
 
-Run only the implemented Technical Assets tests:
+Run only the Technical Assets tests:
 
 ```bash
 npx playwright test tests/inventory/technical-asset.spec.js
 ```
 
-Run only the User Management tests:
+Run only the Asset Management tests (skipping the dependency chain, once
+`auth/auth.json` already exists from a prior `setup` run):
 
 ```bash
-npx playwright test tests/user-management/user-management.spec.js
+npx playwright test tests/asset-management/asset-management.spec.js --project=asset-management --no-deps
 ```
 
 Run one specification:
@@ -360,21 +402,24 @@ Test output is generated in the following locations:
 
 ## CI/CD
 
-The GitHub Actions workflow is located at
-`.github/workflows/playwright.yml`. It installs dependencies and browsers,
-executes the Playwright suite, and uploads the HTML report as a workflow
-artifact.
+The GitHub Actions workflow is located at `.github/workflows/playwright.yml`.
+It installs dependencies and browsers, executes the Playwright suite, and
+uploads the HTML report as a workflow artifact.
 
 ## Future Coverage and Improvements
 
-The following work is planned to expand coverage and improve maintainability:
+The following work is planned to expand coverage and improve
+maintainability:
 
 ### Application coverage
 
-- Add complete positive and negative coverage for Asset Management.
+- Add positive/negative coverage for the Assign Asset and Bulk Upload
+  flows in Asset Management (currently opened and cancelled, not
+  submitted, to avoid mutating shared QA data).
 - Implement Role Management workflows.
 - Cover Compliance, Configurations, and Vault modules.
-- Cover Request Approvals, Request Tracker, HR Requests, and Incident Reports.
+- Cover Request Approvals, Request Tracker, HR Requests, and Incident
+  Reports.
 - Cover Employee Support and Purchase Module workflows.
 - Add authorization and role-based access checks.
 - Add API-assisted setup and data cleanup where appropriate.
@@ -382,7 +427,6 @@ The following work is planned to expand coverage and improve maintainability:
 ### Quality and resilience
 
 - Add cross-browser coverage for Firefox and WebKit.
-- Add responsive and viewport-specific checks.
 - Add accessibility checks for critical pages and forms.
 - Add visual regression checks for stable, high-value screens.
 - Add richer Allure metadata, trends, and stakeholder summaries.
@@ -395,9 +439,11 @@ The following work is planned to expand coverage and improve maintainability:
 New tests should:
 
 1. Follow the existing Page Object Model structure.
-2. Reuse fixtures, constants, and test data instead of duplicating selectors.
-3. Use stable user-facing locators where possible.
-4. Include clear assertions for the expected business behavior.
-5. Avoid committing credentials, generated reports, or temporary artifacts.
-6. Run the relevant module tests before submitting changes.
->>>>>>> 0251848 (Simplified inventory tests for better reliability and readability.)
+2. Reuse fixtures, constants, and test data instead of duplicating
+   selectors.
+3. Use stable, user-facing locators where possible.
+4. Wait for a stable/settled result (not just "something is visible") after
+   any action that triggers a debounced or asynchronous list update.
+5. Include clear assertions for the expected business behavior.
+6. Avoid committing credentials, generated reports, or temporary artifacts.
+7. Run the relevant module tests before submitting changes.
