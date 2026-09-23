@@ -23,60 +23,6 @@ test.describe("Login", () => {
     await expect(login.password).toHaveAttribute("type", "password");
   });
 
-  test("validates invalid-credential error message content", async ({
-    page,
-  }) => {
-    const login = new LoginPage(page);
-
-    await login.openApplication();
-
-    await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
-
-    await login.expectInvalidCredentials();
-  });
-
-  test("clears the invalid-credential error after a new form interaction", async ({
-    page,
-  }) => {
-    const login = new LoginPage(page);
-
-    await login.openApplication();
-
-    await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
-
-    await login.expectInvalidCredentials();
-
-    await login.email.fill(credentials.email);
-
-    await expect(login.getErrorMessage()).toBeHidden();
-  });
-
-  test("returns to the dashboard after navigating to login and dashboard", async ({
-    page,
-  }) => {
-    const login = new LoginPage(page);
-    const dashboard = new DashboardPage(page);
-
-    await login.openApplication();
-
-    await login.login(credentials.email, credentials.password);
-
-    await page.goto("/login", {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
-
-    await login.expectOnLoginPage();
-
-    await page.goto("/", {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
-
-    await login.expectDashboard();
-    await dashboard.verifyDashboardLoaded();
-  });
-
   test("redirects direct dashboard access to the login page", async ({
     page,
   }) => {
@@ -114,17 +60,6 @@ test.describe("Login", () => {
     await expect(login.loginButton).toBeInViewport();
   });
 
-  test("rejects an invalid email and password", async ({ page }) => {
-    const login = new LoginPage(page);
-
-    await login.openApplication();
-
-    await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
-
-    await login.expectInvalidCredentials();
-    await login.expectOnLoginPage();
-  });
-
   test("keeps the user on the login page when fields are empty", async ({
     page,
   }) => {
@@ -138,33 +73,6 @@ test.describe("Login", () => {
     await expect(login.password).toHaveValue("");
 
     await login.expectOnLoginPage();
-  });
-
-  test("rejects an incorrectly formatted email before authentication", async ({
-    page,
-  }) => {
-    const login = new LoginPage(page);
-
-    await login.openApplication();
-
-    await login.submit("not-an-email", "AnyPassword123!");
-
-    await login.expectOnLoginPage();
-  });
-
-  test("logs in with valid credentials and opens the dashboard", async ({
-    page,
-  }) => {
-    const login = new LoginPage(page);
-    const dashboard = new DashboardPage(page);
-
-    await login.openApplication();
-
-    await login.login(credentials.email, credentials.password);
-
-    await dashboard.verifyDashboardLoaded();
-
-    await expect(page).not.toHaveURL(/\/login(?:\/)?$/);
   });
 
   test("toggles password visibility without changing the password value", async ({
@@ -188,6 +96,76 @@ test.describe("Login", () => {
 
     await expect(login.password).toHaveAttribute("type", "password");
     await expect(login.password).toHaveValue(credentials.password);
+  });
+
+  test("autofocuses email and moves focus to password with Tab", async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      "QA currently does not autofocus the email field on the login page",
+    );
+
+    const login = new LoginPage(page);
+
+    await login.openApplication();
+
+    await expect(login.email).toBeFocused();
+
+    await login.email.press("Tab");
+
+    await expect(login.password).toBeFocused();
+  });
+
+  // ==========================================
+  // Tests below require a valid login. They are
+  // grouped together and kept away from the
+  // invalid-credential tests at the end of this
+  // file: submitting several wrong-credential
+  // attempts in quick succession can trip the
+  // app's login throttling, which then rejects
+  // the next valid login for a short window.
+  // ==========================================
+
+  test("returns to the dashboard after navigating to login and dashboard", async ({
+    page,
+  }) => {
+    const login = new LoginPage(page);
+    const dashboard = new DashboardPage(page);
+
+    await login.openApplication();
+
+    await login.login(credentials.email, credentials.password);
+
+    await page.goto("/login", {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
+
+    await login.expectOnLoginPage();
+
+    await page.goto("/", {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
+
+    await login.expectDashboard();
+    await dashboard.verifyDashboardLoaded();
+  });
+
+  test("logs in with valid credentials and opens the dashboard", async ({
+    page,
+  }) => {
+    const login = new LoginPage(page);
+    const dashboard = new DashboardPage(page);
+
+    await login.openApplication();
+
+    await login.login(credentials.email, credentials.password);
+
+    await dashboard.verifyDashboardLoaded();
+
+    await expect(page).not.toHaveURL(/\/login(?:\/)?$/);
   });
 
   test("submits from the email and password fields with Enter", async ({
@@ -219,37 +197,6 @@ test.describe("Login", () => {
 
     await login.expectDashboard();
     await dashboard.verifyDashboardLoaded();
-  });
-
-  test("accepts uppercase, mixed-case, and lowercase email addresses", async ({
-    page,
-  }) => {
-    test.fail(
-      true,
-      "QA currently rejects uppercase and mixed-case variants of a valid email",
-    );
-
-    const login = new LoginPage(page);
-    const dashboard = new DashboardPage(page);
-
-    const emailVariants = [
-      credentials.email.toUpperCase(),
-      credentials.email
-        .split("@")
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join("@"),
-      credentials.email.toLowerCase(),
-    ];
-
-    for (const email of emailVariants) {
-      await login.openApplication();
-
-      await login.login(email, credentials.password);
-
-      await dashboard.verifyDashboardLoaded();
-
-      await dashboard.logout();
-    }
   });
 
   test("redirects to the dashboard and displays dashboard elements", async ({
@@ -322,22 +269,94 @@ test.describe("Login", () => {
     await login.expectOnLoginPage();
   });
 
-  test("autofocuses email and moves focus to password with Tab", async ({
+  // ==========================================
+  // Invalid-credential tests. Kept together at
+  // the end of the file, after the tests above
+  // that require a real login, so a burst of
+  // deliberately wrong login attempts here does
+  // not trip the app's login throttling ahead of
+  // a valid-credential test.
+  // ==========================================
+
+  test("validates invalid-credential error message content", async ({
     page,
   }) => {
-    test.fail(
-      true,
-      "QA currently does not autofocus the email field on the login page",
-    );
-
     const login = new LoginPage(page);
 
     await login.openApplication();
 
-    await expect(login.email).toBeFocused();
+    await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
 
-    await login.email.press("Tab");
+    await login.expectInvalidCredentials();
+  });
 
-    await expect(login.password).toBeFocused();
+  test("clears the invalid-credential error after a new form interaction", async ({
+    page,
+  }) => {
+    const login = new LoginPage(page);
+
+    await login.openApplication();
+
+    await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
+
+    await login.expectInvalidCredentials();
+
+    await login.email.fill(credentials.email);
+
+    await expect(login.getErrorMessage()).toBeHidden();
+  });
+
+  test("rejects an invalid email and password", async ({ page }) => {
+    const login = new LoginPage(page);
+
+    await login.openApplication();
+
+    await login.submit("invalid-user@example.com", "DefinitelyWrongPassword!");
+
+    await login.expectInvalidCredentials();
+    await login.expectOnLoginPage();
+  });
+
+  test("rejects an incorrectly formatted email before authentication", async ({
+    page,
+  }) => {
+    const login = new LoginPage(page);
+
+    await login.openApplication();
+
+    await login.submit("not-an-email", "AnyPassword123!");
+
+    await login.expectOnLoginPage();
+  });
+
+  test("accepts uppercase, mixed-case, and lowercase email addresses", async ({
+    page,
+  }) => {
+    test.fail(
+      true,
+      "QA currently rejects uppercase and mixed-case variants of a valid email",
+    );
+
+    const login = new LoginPage(page);
+    const dashboard = new DashboardPage(page);
+
+    const emailVariants = [
+      credentials.email.toUpperCase(),
+      credentials.email
+        .split("@")
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join("@"),
+      credentials.email.toLowerCase(),
+    ];
+
+    for (const email of emailVariants) {
+      await login.openApplication();
+
+      await login.login(email, credentials.password);
+
+      await dashboard.verifyDashboardLoaded();
+
+      await dashboard.logout();
+    }
   });
 });

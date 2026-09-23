@@ -67,18 +67,34 @@ class UserManagementPage {
       /No users found based on request|No records found\./i,
     );
 
+    // Require the card count to be stable across two consecutive
+    // reads (unless the empty state is showing). Right after a
+    // search/filter change, the previous unfiltered cards are
+    // still on screen until the app's debounced fetch resolves,
+    // so a single "any card visible" read can pass on stale
+    // results before filtering has actually taken effect.
+    let previousCount = null;
+
     await expect
       .poll(
         async () => {
-          const userCount = await this.userCards.count();
-
           const emptyState = await noResults.isVisible().catch(() => false);
 
-          return userCount > 0 || emptyState;
+          if (emptyState) {
+            return true;
+          }
+
+          const userCount = await this.userCards.count();
+
+          const stable = userCount > 0 && userCount === previousCount;
+
+          previousCount = userCount;
+
+          return stable;
         },
         {
           timeout: 10000,
-          intervals: [100, 250, 500],
+          intervals: [300, 300, 500, 500],
         },
       )
       .toBe(true);

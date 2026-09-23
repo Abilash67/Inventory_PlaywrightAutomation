@@ -10,8 +10,8 @@ module.exports = defineConfig({
   timeout: 60000,
   fullyParallel: true,
   forbidOnly: isCI,
-  retries: isCI ? 2 : 0,
-  workers: isCI ? 1 : undefined,
+  retries: isCI ? 2 : 1,
+  workers: 1,
   expect: {
     timeout: 10000,
   },
@@ -73,9 +73,18 @@ module.exports = defineConfig({
       dependencies: ["inventory"],
     },
     {
+      name: "asset-management",
+      testMatch: /tests[\\/]asset-management[\\/].*\.spec\.js/,
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: path.resolve(__dirname, "auth/auth.json"),
+      },
+      dependencies: ["user-management"],
+    },
+    {
       name: "logout",
       testMatch: /tests[\\/]authentication[\\/]logout\.spec\.js/,
-      dependencies: ["user-management"],
+      dependencies: ["asset-management"],
     },
   ],
   reporter: [

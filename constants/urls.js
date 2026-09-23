@@ -8,4 +8,5 @@ module.exports = {
   dashboard: `${baseURL}/`,
   inventory: `${baseURL}/inventory`,
   userManagement: `${baseURL}/users`,
+  assetManagement: `${baseURL}/assets`,
 };

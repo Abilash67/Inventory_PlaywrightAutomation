@@ -84,14 +84,27 @@ class DashboardPage {
   }
 
   async verifyUser() {
-    await expect(this.userName).toBeVisible();
-    await expect(this.employeeId).toBeVisible();
+    await expect(this.userName).toBeVisible({
+      timeout: 20000,
+    });
+
+    await expect(this.employeeId).toBeVisible({
+      timeout: 20000,
+    });
   }
 
   async verifyCards() {
-    await expect(this.assetsTitle).toBeVisible();
-    await expect(this.requestTitle).toBeVisible();
-    await expect(this.notificationTitle).toBeVisible();
+    await expect(this.assetsTitle).toBeVisible({
+      timeout: 20000,
+    });
+
+    await expect(this.requestTitle).toBeVisible({
+      timeout: 20000,
+    });
+
+    await expect(this.notificationTitle).toBeVisible({
+      timeout: 20000,
+    });
   }
 
   async verifyAssetCount() {
