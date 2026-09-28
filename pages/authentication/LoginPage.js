@@ -1,4 +1,5 @@
 const { expect } = require("@playwright/test");
+
 const { login: loginUrl } = require("../../constants/urls");
 
 class LoginPage {
@@ -81,7 +82,6 @@ class LoginPage {
   async submit(username, password) {
     await this.email.fill(username);
     await this.password.fill(password);
-
     await this.loginButton.click();
   }
 
@@ -93,7 +93,12 @@ class LoginPage {
     await this.email.fill(username);
     await this.password.fill(password);
 
-    await field.press("Enter");
+    await Promise.all([
+      this.page.waitForURL(/\/(?:dashboard|inventory)?(?:\/)?$/, {
+        timeout: 30000,
+      }),
+      field.press("Enter"),
+    ]);
   }
 
   // ==========================================
@@ -102,7 +107,6 @@ class LoginPage {
 
   async togglePasswordVisibility() {
     await expect(this.passwordToggle).toBeVisible();
-
     await this.passwordToggle.click();
   }
 

@@ -12,7 +12,7 @@ class UserManagementPage {
       })
       .first();
 
-    this.searchInput = page.getByPlaceholder("🔍 Search Users...");
+    this.searchInput = page.getByPlaceholder("Search Users...");
 
     this.departmentDropdown = page
       .getByText("Select Department", {
