@@ -153,7 +153,7 @@ test.describe("Login", () => {
     await dashboard.verifyDashboardLoaded();
   });
 
-  test("logs in with valid credentials and opens the dashboard", async ({
+  test("logs in with valid credentials and opens the dashboard @smoke", async ({
     page,
   }) => {
     const login = new LoginPage(page);

@@ -18,7 +18,7 @@ test.describe("Logout", () => {
     await dashboard.cancelLogout();
   });
 
-  test("confirms logout and returns to the login page", async ({ page }) => {
+  test("confirms logout and returns to the login page @smoke", async ({ page }) => {
     const dashboard = await loginToDashboard(page);
     const login = new LoginPage(page);
 

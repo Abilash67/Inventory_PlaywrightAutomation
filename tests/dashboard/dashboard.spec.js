@@ -3,7 +3,7 @@ const { test } = require("@playwright/test");
 const DashboardPage = require("../../pages/dashboard/DashboardPage");
 const { captureScreenshot } = require("../../utils/screenshotUtils");
 
-test("Dashboard Verification", async ({ page }) => {
+test("Dashboard Verification @smoke", async ({ page }) => {
   const dashboard = new DashboardPage(page);
 
   await page.goto("/");
