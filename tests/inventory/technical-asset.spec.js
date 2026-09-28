@@ -22,7 +22,7 @@ test.describe("Inventory - Technical Assets", () => {
   // TABLE
   // ============================================================
 
-  test("displays the Technical Assets table", async ({
+  test("displays the Technical Assets table @smoke", async ({
     technicalAssetPage,
   }) => {
     await technicalAssetPage.verifyTechnicalAssetTable();

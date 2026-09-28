@@ -15,7 +15,7 @@ test.describe("Inventory - Infrastructure Assets", () => {
   // TABLE
   // ============================================================
 
-  test("displays the Infrastructure Assets table and pagination state", async ({
+  test("displays the Infrastructure Assets table and pagination state @smoke", async ({
     infrastructureAssetPage,
   }) => {
     const rowCount = await infrastructureAssetPage.rows().count();

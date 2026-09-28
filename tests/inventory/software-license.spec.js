@@ -16,7 +16,7 @@ test.describe("Inventory - Software Licenses", () => {
   // FILTERS
   // ============================================================
 
-  test("displays and filters the Software Licenses table", async ({
+  test("displays and filters the Software Licenses table @smoke", async ({
     softwareLicensePage,
   }) => {
     await softwareLicensePage.selectFilterOption(
