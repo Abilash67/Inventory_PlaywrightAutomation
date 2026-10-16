@@ -371,15 +371,21 @@ test.describe("User Management - Complete Test Suite", () => {
     expect(count).toBe(0);
   });
 
-  // TC35 - PAGE REFRESH
   test("TC35 - Verify users remain after page refresh", async ({ page }) => {
     const initialCount = await userManagementPage.getUserCount();
+
+    expect(initialCount).toBeGreaterThan(0);
 
     await page.reload({
       waitUntil: "domcontentloaded",
     });
 
     await expect(userManagementPage.pageTitle).toBeVisible({
+      timeout: 30000,
+    });
+
+    // Refresh should restore the normal user list.
+    await expect(userManagementPage.userCards.first()).toBeVisible({
       timeout: 30000,
     });
 

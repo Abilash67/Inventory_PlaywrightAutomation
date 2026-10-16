@@ -3,9 +3,14 @@ const { test: base, expect } = require("@playwright/test");
 const LoginPage = require("../pages/authentication/LoginPage");
 const DashboardPage = require("../pages/dashboard/DashboardPage");
 
-const { InventoryPage } = require("../pages/inventory/InventoryPage");
+const {
+  InventoryPage,
+} = require("../pages/inventory/InventoryPage");
 
-const TechnicalAssetPage = require("../pages/inventory/TechnicalAssetPage");
+// FIX: Import the named export correctly
+const {
+  TechnicalAssetPage,
+} = require("../pages/inventory/TechnicalAssetPage");
 
 const {
   SoftwareLicensePage,

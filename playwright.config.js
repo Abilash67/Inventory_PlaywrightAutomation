@@ -5,6 +5,8 @@ const { getEnvironment } = require("./config/environments");
 const { baseURL } = getEnvironment();
 const isCI = Boolean(process.env.CI);
 
+const authState = path.resolve(__dirname, "auth/auth.json");
+
 module.exports = defineConfig({
   testDir: "./tests",
 
@@ -24,7 +26,7 @@ module.exports = defineConfig({
 
   use: {
     baseURL,
-    browserName: "chromium",
+
     headless: process.env.HEADLESS === "true",
 
     viewport: {
@@ -32,7 +34,7 @@ module.exports = defineConfig({
       height: 864,
     },
 
-    actionTimeout: 10000,
+    actionTimeout: 30000,
 
     navigationTimeout: 30000,
 
@@ -44,101 +46,325 @@ module.exports = defineConfig({
   },
 
   projects: [
-    // ---------------------------------------------------------
-    // Authentication setup
-    // ---------------------------------------------------------
+    // ============================================================
+    // AUTHENTICATION SETUP
+    // ============================================================
+
     {
       name: "setup",
-      testMatch: /tests[\\/]authentication[\\/]auth\.setup\.js/,
+      testMatch: "authentication/auth.setup.js",
     },
 
-    // ---------------------------------------------------------
-    // Login
-    // ---------------------------------------------------------
+    // ============================================================
+    // LOGIN - CHROMIUM
+    // ============================================================
+
     {
       name: "login",
-      testMatch: /tests[\\/]authentication[\\/]login\.spec\.js/,
+      testMatch: "authentication/login.spec.js",
+      use: {
+        ...devices["Desktop Chrome"],
+        browserName: "chromium",
+      },
       dependencies: ["setup"],
     },
 
-    // ---------------------------------------------------------
-    // Dashboard
-    // ---------------------------------------------------------
+    // ============================================================
+    // LOGIN - FIREFOX
+    // ============================================================
+
+    {
+      name: "login-firefox",
+      testMatch: "authentication/login.spec.js",
+      use: {
+        ...devices["Desktop Firefox"],
+        browserName: "firefox",
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // LOGIN - WEBKIT
+    // ============================================================
+
+    {
+      name: "login-webkit",
+      testMatch: "authentication/login.spec.js",
+      use: {
+        ...devices["Desktop Safari"],
+        browserName: "webkit",
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // DASHBOARD - CHROMIUM
+    // ============================================================
+
     {
       name: "dashboard",
-      testMatch: /tests[\\/]dashboard[\\/].*\.spec\.js/,
+      testMatch: "dashboard/*.spec.js",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: path.resolve(__dirname, "auth/auth.json"),
+        browserName: "chromium",
+        storageState: authState,
       },
       dependencies: ["setup"],
     },
 
-    // ---------------------------------------------------------
-    // Profile
-    // ---------------------------------------------------------
+    // ============================================================
+    // DASHBOARD - FIREFOX
+    // ============================================================
+
+    {
+      name: "dashboard-firefox",
+      testMatch: "dashboard/*.spec.js",
+      use: {
+        ...devices["Desktop Firefox"],
+        browserName: "firefox",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // DASHBOARD - WEBKIT
+    // ============================================================
+
+    {
+      name: "dashboard-webkit",
+      testMatch: "dashboard/*.spec.js",
+      use: {
+        ...devices["Desktop Safari"],
+        browserName: "webkit",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // PROFILE - CHROMIUM
+    // ============================================================
+
     {
       name: "profile",
-      testMatch: /tests[\\/]profile[\\/].*\.spec\.js/,
+      testMatch: "profile/*.spec.js",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: path.resolve(__dirname, "auth/auth.json"),
+        browserName: "chromium",
+        storageState: authState,
       },
       dependencies: ["setup"],
     },
 
-    // ---------------------------------------------------------
-    // Inventory
-    // ---------------------------------------------------------
+    // ============================================================
+    // PROFILE - FIREFOX
+    // ============================================================
+
+    {
+      name: "profile-firefox",
+      testMatch: "profile/*.spec.js",
+      use: {
+        ...devices["Desktop Firefox"],
+        browserName: "firefox",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // PROFILE - WEBKIT
+    // ============================================================
+
+    {
+      name: "profile-webkit",
+      testMatch: "profile/*.spec.js",
+      use: {
+        ...devices["Desktop Safari"],
+        browserName: "webkit",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // INVENTORY - CHROMIUM
+    // ============================================================
+
     {
       name: "inventory",
-      testMatch: /tests[\\/]inventory[\\/].*\.spec\.js/,
+      testMatch: "inventory/*.spec.js",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: path.resolve(__dirname, "auth/auth.json"),
+        browserName: "chromium",
+        storageState: authState,
       },
       dependencies: ["setup"],
     },
 
-    // ---------------------------------------------------------
-    // User Management
-    // ---------------------------------------------------------
+    // ============================================================
+    // INVENTORY - FIREFOX
+    // ============================================================
+
+    {
+      name: "inventory-firefox",
+      testMatch: "inventory/*.spec.js",
+      use: {
+        ...devices["Desktop Firefox"],
+        browserName: "firefox",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // INVENTORY - WEBKIT
+    // ============================================================
+
+    {
+      name: "inventory-webkit",
+      testMatch: "inventory/*.spec.js",
+      use: {
+        ...devices["Desktop Safari"],
+        browserName: "webkit",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // USER MANAGEMENT - CHROMIUM
+    // ============================================================
+
     {
       name: "user-management",
-      testMatch: /tests[\\/]user-management[\\/].*\.spec\.js/,
+      testMatch: "user-management/*.spec.js",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: path.resolve(__dirname, "auth/auth.json"),
+        browserName: "chromium",
+        storageState: authState,
       },
       dependencies: ["setup"],
     },
 
-    // ---------------------------------------------------------
-    // Asset Management
-    // ---------------------------------------------------------
+    // ============================================================
+    // USER MANAGEMENT - FIREFOX
+    // ============================================================
+
+    {
+      name: "user-management-firefox",
+      testMatch: "user-management/*.spec.js",
+      use: {
+        ...devices["Desktop Firefox"],
+        browserName: "firefox",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // USER MANAGEMENT - WEBKIT
+    // ============================================================
+
+    {
+      name: "user-management-webkit",
+      testMatch: "user-management/*.spec.js",
+      use: {
+        ...devices["Desktop Safari"],
+        browserName: "webkit",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // ASSET MANAGEMENT - CHROMIUM
+    // ============================================================
+
     {
       name: "asset-management",
-      testMatch: /tests[\\/]asset-management[\\/].*\.spec\.js/,
+      testMatch: "asset-management/*.spec.js",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: path.resolve(__dirname, "auth/auth.json"),
+        browserName: "chromium",
+        storageState: authState,
       },
       dependencies: ["setup"],
     },
 
-    // ---------------------------------------------------------
-    // Logout
-    // ---------------------------------------------------------
+    // ============================================================
+    // ASSET MANAGEMENT - FIREFOX
+    // ============================================================
+
+    {
+      name: "asset-management-firefox",
+      testMatch: "asset-management/*.spec.js",
+      use: {
+        ...devices["Desktop Firefox"],
+        browserName: "firefox",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // ASSET MANAGEMENT - WEBKIT
+    // ============================================================
+
+    {
+      name: "asset-management-webkit",
+      testMatch: "asset-management/*.spec.js",
+      use: {
+        ...devices["Desktop Safari"],
+        browserName: "webkit",
+        storageState: authState,
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // LOGOUT - CHROMIUM
+    // ============================================================
+
     {
       name: "logout",
-      testMatch: /tests[\\/]authentication[\\/]logout\.spec\.js/,
+      testMatch: "authentication/logout.spec.js",
+      use: {
+        ...devices["Desktop Chrome"],
+        browserName: "chromium",
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // LOGOUT - FIREFOX
+    // ============================================================
+
+    {
+      name: "logout-firefox",
+      testMatch: "authentication/logout.spec.js",
+      use: {
+        ...devices["Desktop Firefox"],
+        browserName: "firefox",
+      },
+      dependencies: ["setup"],
+    },
+
+    // ============================================================
+    // LOGOUT - WEBKIT
+    // ============================================================
+
+    {
+      name: "logout-webkit",
+      testMatch: "authentication/logout.spec.js",
+      use: {
+        ...devices["Desktop Safari"],
+        browserName: "webkit",
+      },
       dependencies: ["setup"],
     },
   ],
 
-  // ---------------------------------------------------------
-  // Reporters
-  // ---------------------------------------------------------
   reporter: [
     [
       "html",

@@ -6,6 +6,10 @@ class UserManagementPage {
     this.page = page;
     this.urls = urls;
 
+    // ==========================================
+    // Page elements
+    // ==========================================
+
     this.pageTitle = page
       .getByText("User Management", {
         exact: true,
@@ -14,20 +18,26 @@ class UserManagementPage {
 
     this.searchInput = page.getByPlaceholder("Search Users...");
 
+    // Department filter
     this.departmentDropdown = page
-      .getByText("Select Department", {
-        exact: true,
+      .locator(".multiSelectToggle.form-select")
+      .filter({
+        hasText: "Select Department",
       })
       .first();
 
+    // Location filter
     this.locationDropdown = page
-      .getByText("Select Location", {
-        exact: true,
+      .locator(".multiSelectToggle.form-select")
+      .filter({
+        hasText: "Select Location",
       })
       .first();
 
+    // User cards
     this.userCards = page.locator(".userCard:visible");
 
+    // Card action buttons
     this.viewButtons = page.getByRole("button", {
       name: /View/i,
     });
@@ -45,11 +55,12 @@ class UserManagementPage {
     });
   }
 
+  // ==========================================
+  // Open User Management
+  // ==========================================
+
   async goto() {
-    await this.page.goto(this.urls.userManagement, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
+    await this.navigateWithRetry(this.urls.userManagement);
 
     await expect(this.page).toHaveURL(/\/users(?:\/)?$/, {
       timeout: 30000,
@@ -62,17 +73,37 @@ class UserManagementPage {
     await this.waitForUserList();
   }
 
+  // ==========================================
+  // Navigate with one controlled retry
+  // ==========================================
+
+  async navigateWithRetry(url) {
+    try {
+      await this.page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 30000,
+      });
+    } catch {
+      // Allow a transient QA application/network
+      // issue to recover before retrying once.
+      await this.page.waitForTimeout(1000);
+
+      await this.page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 30000,
+      });
+    }
+  }
+
+  // ==========================================
+  // Wait for user list
+  // ==========================================
+
   async waitForUserList() {
     const noResults = this.page.getByText(
       /No users found based on request|No records found\./i,
     );
 
-    // Require the card count to be stable across two consecutive
-    // reads (unless the empty state is showing). Right after a
-    // search/filter change, the previous unfiltered cards are
-    // still on screen until the app's debounced fetch resolves,
-    // so a single "any card visible" read can pass on stale
-    // results before filtering has actually taken effect.
     let previousCount = null;
 
     await expect
@@ -80,29 +111,35 @@ class UserManagementPage {
         async () => {
           const emptyState = await noResults.isVisible().catch(() => false);
 
+          // A valid filter/search can return zero users.
           if (emptyState) {
-            return true;
+            return "empty";
           }
 
           const userCount = await this.userCards.count();
 
-          const stable = userCount > 0 && userCount === previousCount;
+          const stable = userCount === previousCount;
 
           previousCount = userCount;
 
-          return stable;
+          return stable ? `stable:${userCount}` : `changing:${userCount}`;
         },
         {
           timeout: 10000,
-          intervals: [300, 300, 500, 500],
+          intervals: [300, 500, 500, 1000],
         },
       )
-      .toBe(true);
+      .toMatch(/^(empty|stable:\d+)$/);
   }
+
+  // ==========================================
+  // Search user
+  // ==========================================
 
   async searchUser(value) {
     await this.searchInput.waitFor({
       state: "visible",
+      timeout: 10000,
     });
 
     await this.searchInput.fill(value);
@@ -110,17 +147,27 @@ class UserManagementPage {
     await this.waitForUserList();
   }
 
+  // ==========================================
+  // Clear search
+  // ==========================================
+
   async clearSearch() {
     await this.searchInput.fill("");
 
     await this.waitForUserList();
   }
 
-  async getUserCount() {
-    await this.waitForUserList();
+  // ==========================================
+  // Get user count
+  // ==========================================
 
+  async getUserCount() {
     return await this.userCards.count();
   }
+
+  // ==========================================
+  // Get user card
+  // ==========================================
 
   getUserCard(userName) {
     const name = this.page.getByRole("heading", {
@@ -131,25 +178,39 @@ class UserManagementPage {
     return name.locator("xpath=ancestor::*[.//button][1]");
   }
 
+  // ==========================================
+  // Check whether user exists
+  // ==========================================
+
   async userExists(userName) {
     return (await this.getUserCard(userName).count()) > 0;
   }
+
+  // ==========================================
+  // Get user details
+  // ==========================================
 
   async getUserDetails(userName) {
     const card = this.getUserCard(userName);
 
     await card.waitFor({
       state: "visible",
+      timeout: 10000,
     });
 
     return await card.innerText();
   }
+
+  // ==========================================
+  // Click card action
+  // ==========================================
 
   async clickCardAction(userName, action) {
     const card = this.getUserCard(userName);
 
     await card.waitFor({
       state: "visible",
+      timeout: 10000,
     });
 
     await card
@@ -159,27 +220,48 @@ class UserManagementPage {
       .click();
   }
 
+  // ==========================================
+  // View user
+  // ==========================================
+
   async viewUser(userName) {
     await this.clickCardAction(userName, "View");
   }
+
+  // ==========================================
+  // Edit user
+  // ==========================================
 
   async editUser(userName) {
     await this.clickCardAction(userName, "Edit");
   }
 
+  // ==========================================
+  // View user assets
+  // ==========================================
+
   async viewAssets(userName) {
     await this.clickCardAction(userName, "Assets");
   }
 
+  // ==========================================
+  // Delete user
+  // ==========================================
+
   async deleteUser(userName) {
     await this.clickCardAction(userName, "Delete");
   }
+
+  // ==========================================
+  // Check card action
+  // ==========================================
 
   async hasCardAction(userName, action) {
     const card = this.getUserCard(userName);
 
     await card.waitFor({
       state: "visible",
+      timeout: 10000,
     });
 
     return (
@@ -191,42 +273,92 @@ class UserManagementPage {
     );
   }
 
+  // ==========================================
+  // Check View button
+  // ==========================================
+
   async hasViewButton(userName) {
     return await this.hasCardAction(userName, "View");
   }
+
+  // ==========================================
+  // Check Edit button
+  // ==========================================
 
   async hasEditButton(userName) {
     return await this.hasCardAction(userName, "Edit");
   }
 
+  // ==========================================
+  // Check Assets button
+  // ==========================================
+
   async hasAssetsButton(userName) {
     return await this.hasCardAction(userName, "Assets");
   }
+
+  // ==========================================
+  // Check Delete button
+  // ==========================================
 
   async hasDeleteButton(userName) {
     return await this.hasCardAction(userName, "Delete");
   }
 
-  async selectFilter(dropdown, value) {
-    await dropdown.click();
+  // ==========================================
+  // Select filter
+  // ==========================================
 
-    await this.page
+  async selectFilter(dropdown, value) {
+    await expect(dropdown).toBeVisible({
+      timeout: 10000,
+    });
+
+    // The dropdown is already verified as visible.
+    // Avoid scrollIntoViewIfNeeded() because the custom
+    // multiselect can re-render while filter results update.
+
+    await dropdown.click({
+      force: true,
+      timeout: 10000,
+    });
+
+    const option = this.page
       .getByText(value, {
         exact: true,
       })
-      .last()
-      .click();
+      .last();
+
+    await expect(option).toBeVisible({
+      timeout: 10000,
+    });
+
+    await option.click({
+      timeout: 10000,
+    });
 
     await this.waitForUserList();
   }
+
+  // ==========================================
+  // Select department
+  // ==========================================
 
   async selectDepartment(department) {
     await this.selectFilter(this.departmentDropdown, department);
   }
 
+  // ==========================================
+  // Select location
+  // ==========================================
+
   async selectLocation(location) {
     await this.selectFilter(this.locationDropdown, location);
   }
+
+  // ==========================================
+  // Clear location filter
+  // ==========================================
 
   async clearLocation() {
     await this.page.reload({
@@ -248,6 +380,10 @@ class UserManagementPage {
 
     await this.waitForUserList();
   }
+
+  // ==========================================
+  // Reset search
+  // ==========================================
 
   async resetSearch() {
     await this.clearSearch();

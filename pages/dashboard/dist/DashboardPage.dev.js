@@ -62,19 +62,19 @@ function () {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap(expect(this.assetsTitle).toBeVisible({
+              return regeneratorRuntime.awrap(expect(this.page).toHaveURL(/\/(?:dashboard)?$/, {
                 timeout: 10000
               }));
 
             case 2:
               _context.next = 4;
-              return regeneratorRuntime.awrap(expect(this.requestTitle).toBeVisible({
+              return regeneratorRuntime.awrap(expect(this.userName).toBeVisible({
                 timeout: 10000
               }));
 
             case 4:
               _context.next = 6;
-              return regeneratorRuntime.awrap(expect(this.notificationTitle).toBeVisible({
+              return regeneratorRuntime.awrap(expect(this.employeeId).toBeVisible({
                 timeout: 10000
               }));
 
@@ -93,11 +93,15 @@ function () {
           switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return regeneratorRuntime.awrap(expect(this.userName).toBeVisible());
+              return regeneratorRuntime.awrap(expect(this.userName).toBeVisible({
+                timeout: 20000
+              }));
 
             case 2:
               _context2.next = 4;
-              return regeneratorRuntime.awrap(expect(this.employeeId).toBeVisible());
+              return regeneratorRuntime.awrap(expect(this.employeeId).toBeVisible({
+                timeout: 20000
+              }));
 
             case 4:
             case "end":
@@ -114,15 +118,21 @@ function () {
           switch (_context3.prev = _context3.next) {
             case 0:
               _context3.next = 2;
-              return regeneratorRuntime.awrap(expect(this.assetsTitle).toBeVisible());
+              return regeneratorRuntime.awrap(expect(this.assetsTitle).toBeVisible({
+                timeout: 20000
+              }));
 
             case 2:
               _context3.next = 4;
-              return regeneratorRuntime.awrap(expect(this.requestTitle).toBeVisible());
+              return regeneratorRuntime.awrap(expect(this.requestTitle).toBeVisible({
+                timeout: 20000
+              }));
 
             case 4:
               _context3.next = 6;
-              return regeneratorRuntime.awrap(expect(this.notificationTitle).toBeVisible());
+              return regeneratorRuntime.awrap(expect(this.notificationTitle).toBeVisible({
+                timeout: 20000
+              }));
 
             case 6:
             case "end":
@@ -400,35 +410,17 @@ function () {
 
             case 6:
               _context14.next = 8;
-              return regeneratorRuntime.awrap(this.clearClientSession());
-
-            case 8:
-            case "end":
-              return _context14.stop();
-          }
-        }
-      }, null, this);
-    }
-  }, {
-    key: "clearClientSession",
-    value: function clearClientSession() {
-      return regeneratorRuntime.async(function clearClientSession$(_context15) {
-        while (1) {
-          switch (_context15.prev = _context15.next) {
-            case 0:
-              _context15.next = 2;
               return regeneratorRuntime.awrap(this.page.evaluate(function () {
-                localStorage.clear();
-                sessionStorage.clear();
+                sessionStorage.removeItem("inventory_access_token");
               }));
 
-            case 2:
-              _context15.next = 4;
+            case 8:
+              _context14.next = 10;
               return regeneratorRuntime.awrap(this.page.context().clearCookies());
 
-            case 4:
+            case 10:
             case "end":
-              return _context15.stop();
+              return _context14.stop();
           }
         }
       }, null, this);

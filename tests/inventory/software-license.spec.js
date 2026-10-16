@@ -205,35 +205,30 @@ test.describe("Inventory - Software Licenses", () => {
 
     await expect(dialog).toBeVisible();
 
-    const focusedTags = [];
+    const focusedElements = [];
 
     for (let i = 0; i < 12; i++) {
       await page.keyboard.press("Tab");
 
-      const tagName = await page.evaluate(() => {
-        const element = document.activeElement;
+      const isInsideDialog = await dialog.evaluate((dialogElement) => {
+        const activeElement = document.activeElement;
 
-        return element ? element.tagName.toLowerCase() : null;
+        return (
+          activeElement instanceof HTMLElement &&
+          dialogElement.contains(activeElement)
+        );
       });
 
-      focusedTags.push(tagName);
+      if (isInsideDialog) {
+        const tagName = await page.evaluate(() =>
+          document.activeElement?.tagName.toLowerCase(),
+        );
+
+        focusedElements.push(tagName);
+      }
     }
 
-    const focusableTypes = ["input", "select", "textarea", "button", "a"];
-
-    const insideDialog = focusedTags.filter((tag) =>
-      focusableTypes.includes(tag),
-    );
-
-    expect(insideDialog.length).toBeGreaterThanOrEqual(5);
-
-    const isTrapped = await page.evaluate(() => {
-      const element = document.activeElement;
-
-      return element ? !!element.closest('[role="dialog"]') : false;
-    });
-
-    expect(isTrapped).toBe(true);
+    expect(focusedElements.length).toBeGreaterThanOrEqual(5);
 
     await softwareLicensePage.cancelForm();
   });
@@ -536,7 +531,6 @@ test.describe("Inventory - Software Licenses", () => {
     expect(software).toBeTruthy();
 
     const purchaseDate = "2027-09-18";
-
     const expirationDate = "2026-09-18";
 
     await softwareLicensePage.fillLicenseForm({

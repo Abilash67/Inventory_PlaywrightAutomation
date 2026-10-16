@@ -33,8 +33,11 @@ test.describe("Inventory - Infrastructure Assets", function () {
         }
       }
     });
-  });
-  test("displays the Infrastructure Assets table and pagination state", function _callee2(_ref2) {
+  }); // ============================================================
+  // TABLE
+  // ============================================================
+
+  test("displays the Infrastructure Assets table and pagination state @smoke", function _callee2(_ref2) {
     var infrastructureAssetPage, rowCount;
     return regeneratorRuntime.async(function _callee2$(_context2) {
       while (1) {
@@ -64,7 +67,10 @@ test.describe("Inventory - Infrastructure Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // ROWS PER PAGE
+  // ============================================================
+
   test("changes the infrastructure rows per page control", function _callee3(_ref3) {
     var infrastructureAssetPage, initialRowCount;
     return regeneratorRuntime.async(function _callee3$(_context3) {
@@ -94,7 +100,10 @@ test.describe("Inventory - Infrastructure Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // VIEW / EDIT
+  // ============================================================
+
   test("opens infrastructure asset details and edit form", function _callee4(_ref4) {
     var infrastructureAssetPage;
     return regeneratorRuntime.async(function _callee4$(_context4) {
@@ -140,7 +149,10 @@ test.describe("Inventory - Infrastructure Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // ADD FORM
+  // ============================================================
+
   test("opens the Add Infrastructure Asset form with supported fields", function _callee5(_ref5) {
     var infrastructureAssetPage;
     return regeneratorRuntime.async(function _callee5$(_context5) {
@@ -172,7 +184,10 @@ test.describe("Inventory - Infrastructure Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // ADD VALID INFRASTRUCTURE ASSET
+  // ============================================================
+
   test("adds a valid infrastructure asset and verifies the created record", function _callee6(_ref6) {
     var infrastructureAssetPage, assetCode;
     return regeneratorRuntime.async(function _callee6$(_context6) {

@@ -17,74 +17,95 @@ function () {
       name: "Inventory",
       exact: true
     });
+    this.inventoryHeading = page.getByRole("heading", {
+      name: "Inventory",
+      exact: true
+    });
+    this.tabList = page.getByRole("tablist");
     this.technicalAssets = page.getByRole("tab", {
-      name: "Technical Assets"
+      name: "Technical Assets",
+      exact: true
     });
     this.softwareLicenses = page.getByRole("tab", {
-      name: "Software Licenses"
+      name: "Software Licenses",
+      exact: true
     });
     this.infrastructureAssets = page.getByRole("tab", {
-      name: "Infrastructure Assets"
+      name: "Infrastructure Assets",
+      exact: true
     });
   }
 
   _createClass(InventoryPage, [{
     key: "navigateToInventory",
     value: function navigateToInventory() {
-      var inventoryMenu;
       return regeneratorRuntime.async(function navigateToInventory$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              if (!/\/inventory(?:\/)?$/.test(this.page.url())) {
-                _context.next = 2;
+              if (/\/inventory(?:\/)?$/.test(this.page.url())) {
+                _context.next = 14;
                 break;
               }
 
-              return _context.abrupt("return");
-
-            case 2:
-              _context.next = 4;
+              _context.next = 3;
               return regeneratorRuntime.awrap(this.page.waitForLoadState("domcontentloaded"));
 
-            case 4:
-              inventoryMenu = this.page.getByRole("link", {
-                name: "Inventory",
-                exact: true
-              });
-              _context.next = 7;
-              return regeneratorRuntime.awrap(inventoryMenu.isVisible()["catch"](function () {
+            case 3:
+              _context.next = 5;
+              return regeneratorRuntime.awrap(this.inventoryMenu.isVisible()["catch"](function () {
                 return false;
               }));
 
-            case 7:
+            case 5:
               if (!_context.sent) {
-                _context.next = 12;
+                _context.next = 10;
                 break;
               }
 
-              _context.next = 10;
-              return regeneratorRuntime.awrap(inventoryMenu.click());
+              _context.next = 8;
+              return regeneratorRuntime.awrap(this.inventoryMenu.click());
+
+            case 8:
+              _context.next = 12;
+              break;
 
             case 10:
-              _context.next = 14;
-              break;
+              _context.next = 12;
+              return regeneratorRuntime.awrap(this.page["goto"]("/inventory", {
+                waitUntil: "domcontentloaded",
+                timeout: 30000
+              }));
 
             case 12:
               _context.next = 14;
-              return regeneratorRuntime.awrap(this.page["goto"]("/inventory", {
+              return regeneratorRuntime.awrap(this.page.waitForURL(/\/inventory(?:\/)?$/, {
                 waitUntil: "domcontentloaded",
                 timeout: 30000
               }));
 
             case 14:
               _context.next = 16;
-              return regeneratorRuntime.awrap(this.page.waitForURL(/\/inventory(?:\/)?$/, {
-                waitUntil: "domcontentloaded",
+              return regeneratorRuntime.awrap(this.inventoryHeading.waitFor({
+                state: "visible",
                 timeout: 30000
               }));
 
             case 16:
+              _context.next = 18;
+              return regeneratorRuntime.awrap(this.tabList.waitFor({
+                state: "visible",
+                timeout: 30000
+              }));
+
+            case 18:
+              _context.next = 20;
+              return regeneratorRuntime.awrap(this.technicalAssets.waitFor({
+                state: "visible",
+                timeout: 30000
+              }));
+
+            case 20:
             case "end":
               return _context.stop();
           }
@@ -94,6 +115,7 @@ function () {
   }, {
     key: "openTechnicalAssets",
     value: function openTechnicalAssets() {
+      var selected;
       return regeneratorRuntime.async(function openTechnicalAssets$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
@@ -101,14 +123,36 @@ function () {
               _context2.next = 2;
               return regeneratorRuntime.awrap(this.technicalAssets.waitFor({
                 state: "visible",
-                timeout: 15000
+                timeout: 30000
               }));
 
             case 2:
               _context2.next = 4;
-              return regeneratorRuntime.awrap(this.technicalAssets.click());
+              return regeneratorRuntime.awrap(this.technicalAssets.getAttribute("aria-selected"));
 
             case 4:
+              selected = _context2.sent;
+
+              if (!(selected !== "true")) {
+                _context2.next = 8;
+                break;
+              }
+
+              _context2.next = 8;
+              return regeneratorRuntime.awrap(this.technicalAssets.click({
+                timeout: 15000
+              }));
+
+            case 8:
+              _context2.next = 10;
+              return regeneratorRuntime.awrap(this.page.getByRole("tabpanel", {
+                name: "Technical Assets"
+              }).waitFor({
+                state: "visible",
+                timeout: 30000
+              }));
+
+            case 10:
             case "end":
               return _context2.stop();
           }
@@ -118,6 +162,7 @@ function () {
   }, {
     key: "openSoftwareLicenses",
     value: function openSoftwareLicenses() {
+      var selected;
       return regeneratorRuntime.async(function openSoftwareLicenses$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
@@ -125,14 +170,36 @@ function () {
               _context3.next = 2;
               return regeneratorRuntime.awrap(this.softwareLicenses.waitFor({
                 state: "visible",
-                timeout: 15000
+                timeout: 30000
               }));
 
             case 2:
               _context3.next = 4;
-              return regeneratorRuntime.awrap(this.softwareLicenses.click());
+              return regeneratorRuntime.awrap(this.softwareLicenses.getAttribute("aria-selected"));
 
             case 4:
+              selected = _context3.sent;
+
+              if (!(selected !== "true")) {
+                _context3.next = 8;
+                break;
+              }
+
+              _context3.next = 8;
+              return regeneratorRuntime.awrap(this.softwareLicenses.click({
+                timeout: 15000
+              }));
+
+            case 8:
+              _context3.next = 10;
+              return regeneratorRuntime.awrap(this.page.getByRole("tabpanel", {
+                name: "Software Licenses"
+              }).waitFor({
+                state: "visible",
+                timeout: 30000
+              }));
+
+            case 10:
             case "end":
               return _context3.stop();
           }
@@ -142,6 +209,7 @@ function () {
   }, {
     key: "openInfrastructureAssets",
     value: function openInfrastructureAssets() {
+      var selected;
       return regeneratorRuntime.async(function openInfrastructureAssets$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
@@ -149,14 +217,36 @@ function () {
               _context4.next = 2;
               return regeneratorRuntime.awrap(this.infrastructureAssets.waitFor({
                 state: "visible",
-                timeout: 15000
+                timeout: 30000
               }));
 
             case 2:
               _context4.next = 4;
-              return regeneratorRuntime.awrap(this.infrastructureAssets.click());
+              return regeneratorRuntime.awrap(this.infrastructureAssets.getAttribute("aria-selected"));
 
             case 4:
+              selected = _context4.sent;
+
+              if (!(selected !== "true")) {
+                _context4.next = 8;
+                break;
+              }
+
+              _context4.next = 8;
+              return regeneratorRuntime.awrap(this.infrastructureAssets.click({
+                timeout: 15000
+              }));
+
+            case 8:
+              _context4.next = 10;
+              return regeneratorRuntime.awrap(this.page.getByRole("tabpanel", {
+                name: "Infrastructure Assets"
+              }).waitFor({
+                state: "visible",
+                timeout: 30000
+              }));
+
+            case 10:
             case "end":
               return _context4.stop();
           }

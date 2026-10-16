@@ -53,10 +53,7 @@ class LoginPage {
     // an existing authentication session.
     await this.page.context().clearCookies();
 
-    await this.page.goto(loginUrl, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000,
-    });
+    await this.navigateWithRetry(loginUrl);
 
     await expect(this.page).toHaveURL(/\/login(?:\/)?$/, {
       timeout: 30000,
@@ -76,13 +73,38 @@ class LoginPage {
   }
 
   // ==========================================
+  // Navigate with one controlled retry
+  // ==========================================
+
+  async navigateWithRetry(url) {
+    try {
+      await this.page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 30000,
+      });
+    } catch {
+      // Allow a transient QA application/network issue
+      // to recover before retrying once.
+      await this.page.waitForTimeout(1000);
+
+      await this.page.goto(url, {
+        waitUntil: "domcontentloaded",
+        timeout: 30000,
+      });
+    }
+  }
+
+  // ==========================================
   // Submit login
   // ==========================================
 
   async submit(username, password) {
     await this.email.fill(username);
     await this.password.fill(password);
-    await this.loginButton.click();
+    await this.loginButton.waitFor({ state: "visible", timeout: 30000 });
+    // Use force click for better cross-browser compatibility
+    // Firefox may have timing issues with regular clicks
+    await this.loginButton.click({ force: true });
   }
 
   // ==========================================

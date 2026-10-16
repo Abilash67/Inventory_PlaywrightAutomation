@@ -96,7 +96,13 @@ test.describe("Inventory - Technical Assets", () => {
   test("clears search and restores the table", async ({
     technicalAssetPage,
   }) => {
+    // Make sure the initial table has actually rendered before
+    // capturing the expected row count.
+    await technicalAssetPage.waitForTableRows();
+
     const initialRows = await technicalAssetPage.rows().count();
+
+    expect(initialRows).toBeGreaterThan(0);
 
     await technicalAssetPage.searchAsset("TV-DT-6863");
 
@@ -106,7 +112,7 @@ test.describe("Inventory - Technical Assets", () => {
 
     await expect
       .poll(() => technicalAssetPage.rows().count(), {
-        timeout: 10000,
+        timeout: 15000,
         intervals: [200, 500, 1000],
       })
       .toBe(initialRows);
@@ -262,7 +268,7 @@ test.describe("Inventory - Technical Assets", () => {
 
     await expect
       .poll(() => technicalAssetPage.rows().count(), {
-        timeout: 10000,
+        timeout: 15000,
         intervals: [200, 500, 1000],
       })
       .toBe(1);

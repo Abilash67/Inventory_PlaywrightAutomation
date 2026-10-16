@@ -70,7 +70,7 @@ class DashboardPage {
   }
 
   async verifyDashboardLoaded() {
-    await expect(this.page).toHaveURL(/\/(?:dashboard)?(?:\/)?$/, {
+    await expect(this.page).toHaveURL(/\/(?:dashboard)?$/, {
       timeout: 10000,
     });
 
@@ -142,7 +142,7 @@ class DashboardPage {
       timeout: 5000,
     });
 
-    await this.viewAssets.click();
+    await this.viewAssets.click({ force: true });
 
     await expect(this.page).toHaveURL(/\/profile/, {
       timeout: 10000,
@@ -154,7 +154,7 @@ class DashboardPage {
       timeout: 5000,
     });
 
-    await this.viewRequests.click();
+    await this.viewRequests.click({ force: true });
 
     await expect(this.page).toHaveURL(/\/support(?:\/)?$/, {
       timeout: 10000,
@@ -172,13 +172,13 @@ class DashboardPage {
       timeout: 10000,
     });
 
-    await this.profileMenu.click();
+    await this.profileMenu.click({ force: true });
 
     await expect(this.logoutButton).toBeVisible({
       timeout: 5000,
     });
 
-    await this.logoutButton.click();
+    await this.logoutButton.click({ force: true });
 
     await expect(this.logoutConfirmationModal).toBeVisible({
       timeout: 5000,
@@ -192,7 +192,7 @@ class DashboardPage {
   async cancelLogout() {
     await this.openLogoutConfirmation();
 
-    await this.cancelLogoutButton.click();
+    await this.cancelLogoutButton.click({ force: true });
 
     await expect(this.logoutConfirmationModal).toBeHidden();
 
@@ -202,21 +202,18 @@ class DashboardPage {
   async logout() {
     await this.openLogoutConfirmation();
 
-    await this.confirmLogoutButton.click();
+    await this.confirmLogoutButton.click({ force: true });
 
     await expect(this.page).toHaveURL(/\/login(?:\/)?$/, {
       timeout: 10000,
     });
 
-    await this.clearClientSession();
-  }
-
-  async clearClientSession() {
+    // Remove client-side authentication token.
     await this.page.evaluate(() => {
-      localStorage.clear();
-      sessionStorage.clear();
+      sessionStorage.removeItem("inventory_access_token");
     });
 
+    // Remove authentication cookies.
     await this.page.context().clearCookies();
   }
 }

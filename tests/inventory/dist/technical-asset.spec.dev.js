@@ -13,7 +13,10 @@ test.describe("Inventory - Technical Assets", function () {
           case 0:
             page = _ref.page, inventoryPage = _ref.inventoryPage;
             _context.next = 3;
-            return regeneratorRuntime.awrap(page["goto"]("/"));
+            return regeneratorRuntime.awrap(page["goto"]("/", {
+              waitUntil: "domcontentloaded",
+              timeout: 30000
+            }));
 
           case 3:
             _context.next = 5;
@@ -21,7 +24,10 @@ test.describe("Inventory - Technical Assets", function () {
 
           case 5:
             _context.next = 7;
-            return regeneratorRuntime.awrap(expect(page).toHaveURL(/inventory/));
+            return regeneratorRuntime.awrap(inventoryPage.technicalAssets.waitFor({
+              state: "visible",
+              timeout: 30000
+            }));
 
           case 7:
             _context.next = 9;
@@ -33,8 +39,11 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  });
-  test("displays the Technical Assets table", function _callee2(_ref2) {
+  }); // ============================================================
+  // TABLE
+  // ============================================================
+
+  test("displays the Technical Assets table @smoke", function _callee2(_ref2) {
     var technicalAssetPage;
     return regeneratorRuntime.async(function _callee2$(_context2) {
       while (1) {
@@ -58,7 +67,10 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // FILTERS
+  // ============================================================
+
   test("applies multiple filters simultaneously", function _callee3(_ref3) {
     var technicalAssetPage, rows, rowCount, i, row;
     return regeneratorRuntime.async(function _callee3$(_context3) {
@@ -136,7 +148,10 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // SEARCH
+  // ============================================================
+
   test("displays no results for a non-matching search", function _callee4(_ref4) {
     var technicalAssetPage;
     return regeneratorRuntime.async(function _callee4$(_context4) {
@@ -168,37 +183,45 @@ test.describe("Inventory - Technical Assets", function () {
           case 0:
             technicalAssetPage = _ref5.technicalAssetPage;
             _context5.next = 3;
-            return regeneratorRuntime.awrap(technicalAssetPage.rows().count());
+            return regeneratorRuntime.awrap(technicalAssetPage.waitForTableRows());
 
           case 3:
+            _context5.next = 5;
+            return regeneratorRuntime.awrap(technicalAssetPage.rows().count());
+
+          case 5:
             initialRows = _context5.sent;
-            _context5.next = 6;
+            expect(initialRows).toBeGreaterThan(0);
+            _context5.next = 9;
             return regeneratorRuntime.awrap(technicalAssetPage.searchAsset("TV-DT-6863"));
 
-          case 6:
-            _context5.next = 8;
+          case 9:
+            _context5.next = 11;
             return regeneratorRuntime.awrap(expect(technicalAssetPage.rows()).toHaveCount(1));
 
-          case 8:
-            _context5.next = 10;
+          case 11:
+            _context5.next = 13;
             return regeneratorRuntime.awrap(technicalAssetPage.clearSearch());
 
-          case 10:
-            _context5.next = 12;
+          case 13:
+            _context5.next = 15;
             return regeneratorRuntime.awrap(expect.poll(function () {
               return technicalAssetPage.rows().count();
             }, {
-              timeout: 10000,
+              timeout: 15000,
               intervals: [200, 500, 1000]
             }).toBe(initialRows));
 
-          case 12:
+          case 15:
           case "end":
             return _context5.stop();
         }
       }
     });
-  });
+  }); // ============================================================
+  // PAGINATION
+  // ============================================================
+
   test("changes rows per page", function _callee6(_ref6) {
     var technicalAssetPage, rowsPerPage, currentValue, options, newValue, visibleRows;
     return regeneratorRuntime.async(function _callee6$(_context6) {
@@ -292,7 +315,10 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // VIEW / EDIT / HISTORY
+  // ============================================================
+
   test("opens asset details, edit form, and history", function _callee8(_ref8) {
     var page, technicalAssetPage, assetCode;
     return regeneratorRuntime.async(function _callee8$(_context8) {
@@ -354,7 +380,10 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // ADD ASSET FORM
+  // ============================================================
+
   test("opens the add asset form with all supported fields", function _callee9(_ref9) {
     var technicalAssetPage;
     return regeneratorRuntime.async(function _callee9$(_context9) {
@@ -383,7 +412,9 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  }); // Phase 1 - Add Valid Technical Asset
+  }); // ============================================================
+  // PHASE 1 - ADD VALID ASSET
+  // ============================================================
 
   test("adds a valid Technical Asset and verifies the created record", function _callee10(_ref10) {
     var technicalAssetPage, testData, generatedAssetCode;
@@ -439,7 +470,7 @@ test.describe("Inventory - Technical Assets", function () {
             return regeneratorRuntime.awrap(expect.poll(function () {
               return technicalAssetPage.rows().count();
             }, {
-              timeout: 10000,
+              timeout: 15000,
               intervals: [200, 500, 1000]
             }).toBe(1));
 
@@ -485,7 +516,10 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // EDIT VALIDATION
+  // ============================================================
+
   test("validates required field during Edit", function _callee11(_ref11) {
     var technicalAssetPage, assetCode;
     return regeneratorRuntime.async(function _callee11$(_context11) {
@@ -565,7 +599,10 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // ADD VALIDATION
+  // ============================================================
+
   test("validates required fields during Add Asset", function _callee13(_ref13) {
     var technicalAssetPage;
     return regeneratorRuntime.async(function _callee13$(_context13) {
@@ -713,7 +750,10 @@ test.describe("Inventory - Technical Assets", function () {
         }
       }
     });
-  });
+  }); // ============================================================
+  // BULK UPLOAD
+  // ============================================================
+
   test("verifies the bulk upload template link and accepts an Excel file", function _callee17(_ref17) {
     var technicalAssetPage, downloadLink, href;
     return regeneratorRuntime.async(function _callee17$(_context17) {
@@ -726,18 +766,18 @@ test.describe("Inventory - Technical Assets", function () {
 
           case 3:
             downloadLink = technicalAssetPage.dialog().getByRole("link", {
-              name: /Download Sample Template/
+              name: /Download Sample Template/i
             });
             _context17.next = 6;
             return regeneratorRuntime.awrap(expect(downloadLink).toBeVisible());
 
           case 6:
             _context17.next = 8;
-            return regeneratorRuntime.awrap(expect(downloadLink).toHaveAttribute("href", /addAssets\.xlsx/));
+            return regeneratorRuntime.awrap(expect(downloadLink).toHaveAttribute("href", /addAssets\.xlsx/i));
 
           case 8:
             _context17.next = 10;
-            return regeneratorRuntime.awrap(technicalAssetPage.downloadBulkUploadTemplate());
+            return regeneratorRuntime.awrap(downloadLink.getAttribute("href"));
 
           case 10:
             href = _context17.sent;

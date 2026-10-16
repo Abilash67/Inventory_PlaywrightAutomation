@@ -9,7 +9,9 @@ Playwright/JavaScript end-to-end automation for the Inventory application.
 - 9 active test specification files covering authentication, dashboard,
   profile, inventory (technical assets, software licenses, infrastructure
   assets), user management, and asset management.
-- 8 page-object files organized by application feature.
+- 20 page-object files organized by application feature (one shared base page,
+  one shared header/navigation page, and one page object per application
+  module).
 - Shared fixtures, utilities, constants, environment configuration, and JSON
   test data.
 - Authentication setup with a reusable `auth/auth.json` storage state.
@@ -20,6 +22,7 @@ Playwright/JavaScript end-to-end automation for the Inventory application.
   configured.
 - Local retries (`retries: 1`) and single-worker execution (`workers: 1`) to
   absorb transient latency from the shared QA environment.
+- Smoke-test tags (`@smoke`) on critical end-to-end paths across all modules.
 
 ### Test Discovery
 
@@ -29,6 +32,7 @@ The current configuration discovers **121 tests in 10 files**:
 | --- | --- | ---: |
 | setup | `tests/authentication/auth.setup.js` | 1 |
 | login | `tests/authentication/login.spec.js` | 19 |
+| logout | `tests/authentication/logout.spec.js` | 7 |
 | dashboard | `tests/dashboard/dashboard.spec.js` | 1 |
 | profile | `tests/profile/profile.spec.js` | 1 |
 | inventory | `tests/inventory/technical-asset.spec.js` | 16 |
@@ -36,14 +40,25 @@ The current configuration discovers **121 tests in 10 files**:
 | inventory | `tests/inventory/infrastructure-asset.spec.js` | 5 |
 | user-management | `tests/user-management/user-management.spec.js` | 39 |
 | asset-management | `tests/asset-management/asset-management.spec.js` | 12 |
-| logout | `tests/authentication/logout.spec.js` | 7 |
 
-`tests/inventory/inventory.spec.js` and 10 other module spec files
-(`compliance`, `configurations`, `employee-support`, `hr-requests`,
-`incident-reports`, `purchase-module`, `request-approvals`,
-`request-tracker`, `role-management`, `vault`) exist as empty placeholders
-and currently contribute no tests. See
-[Future Coverage and Improvements](#future-coverage-and-improvements).
+### Smoke Tests
+
+The suite marks 6 critical smoke tests with the `@smoke` tag:
+
+| Tag | Test |
+| --- | --- |
+| `@smoke` | Login with valid credentials and dashboard access |
+| `@smoke` | Dashboard verification |
+| `@smoke` | Logout confirmation and redirect to login |
+| `@smoke` | Technical Assets table renders |
+| `@smoke` | Software Licenses table renders and filters |
+| `@smoke` | Infrastructure Assets table and pagination |
+
+Run smoke tests only:
+
+```bash
+npx playwright test --grep "@smoke"
+```
 
 ### Configuration
 
@@ -77,12 +92,18 @@ Supported environment variables:
 
 | Variable | Purpose |
 | --- | --- |
-| `TEST_ENV` | Selects a configured environment |
+| `TEST_ENV` | Selects a configured environment (`qa`, `staging`, `production`) |
 | `BASE_URL` | Overrides the configured base URL |
 | `TEST_USER_EMAIL` | Overrides the test login email |
 | `TEST_USER_PASSWORD` | Overrides the test login password |
 | `HEADLESS` | Set to `true` to run browsers headless |
 | `CI` | Set by CI; raises retries to 2 and forbids `.only` |
+
+Environment-specific configurations are available:
+
+- `config/qa.config.js` — QA environment (default)
+- `config/staging.config.js` — Staging environment
+- `config/production.config.js` — Production environment
 
 Credentials are resolved by `config/credentials.js`. Keep credentials outside
 source control when running in CI or against shared environments.
@@ -104,22 +125,25 @@ repository.
 
 ```text
 Playwright/
-├── config/              # Environment and credential configuration
-├── constants/           # URLs and shared constants
-├── fixtures/            # Reusable Playwright fixtures
-├── pages/               # Page objects and reusable UI actions
-├── test-data/           # Non-secret test data
-├── tests/                # Test specifications grouped by module
-├── auth/                # Saved authentication storage state
-├── screenshots/         # Baseline and diagnostic screenshots
-├── test-results/        # Playwright execution artifacts
-├── playwright-report/   # HTML report output
-└── allure-results/      # Allure result files
+├── config/                # Environment and credential configuration
+├── constants/             # URLs, messages, and shared constants
+├── docs/                  # Documentation (coding standards, framework design)
+├── fixtures/              # Reusable Playwright fixtures
+├── pages/                 # Page objects grouped by feature
+│   └── Common/            # Shared base page, header, and navigation
+├── test-data/             # JSON test data (non-secret)
+├── tests/                 # Test specifications grouped by module
+├── utils/                 # Common utilities (wait, screenshot, test data)
+├── auth/                  # Saved authentication storage state
+├── screenshots/           # Baseline and diagnostic screenshots
+├── test-results/          # Playwright execution artifacts
+├── playwright-report/     # HTML report output
+└── allure-results/        # Allure result files
 ```
 
 ## Current Coverage
 
-| Area | Test file | Tests | Current coverage |
+| Area | Test file | Tests | Coverage |
 | --- | --- | ---: | --- |
 | Login | `tests/authentication/login.spec.js` | 19 | Form controls, password type, invalid credentials and error content, error clearing, Enter-key submission, navigation, protected-route redirects, email casing, refresh persistence, whitespace handling, mobile layout, and keyboard focus |
 | Logout | `tests/authentication/logout.spec.js` | 7 | Cancel/confirm logout, client session cleanup, logout from Inventory, multi-tab invalidation, bookmarked URL protection, redirect to login, and session protection after logout |
@@ -336,6 +360,12 @@ the command:
 cmd /c "npx playwright test"
 ```
 
+Run smoke tests only:
+
+```bash
+npx playwright test --grep "@smoke"
+```
+
 Run a single module:
 
 ```bash
@@ -446,4 +476,5 @@ New tests should:
    any action that triggers a debounced or asynchronous list update.
 5. Include clear assertions for the expected business behavior.
 6. Avoid committing credentials, generated reports, or temporary artifacts.
-7. Run the relevant module tests before submitting changes.
+7. Mark critical smoke tests with the `@smoke` tag.
+8. Run the relevant module tests before submitting changes.

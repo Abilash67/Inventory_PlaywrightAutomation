@@ -965,8 +965,7 @@ test.describe("User Management - Complete Test Suite", function () {
         }
       }
     });
-  }); // TC35 - PAGE REFRESH
-
+  });
   test("TC35 - Verify users remain after page refresh", function _callee36(_ref4) {
     var page, initialCount, afterRefreshCount;
     return regeneratorRuntime.async(function _callee36$(_context36) {
@@ -979,26 +978,33 @@ test.describe("User Management - Complete Test Suite", function () {
 
           case 3:
             initialCount = _context36.sent;
-            _context36.next = 6;
+            expect(initialCount).toBeGreaterThan(0);
+            _context36.next = 7;
             return regeneratorRuntime.awrap(page.reload({
               waitUntil: "domcontentloaded"
             }));
 
-          case 6:
-            _context36.next = 8;
+          case 7:
+            _context36.next = 9;
             return regeneratorRuntime.awrap(expect(userManagementPage.pageTitle).toBeVisible({
               timeout: 30000
             }));
 
-          case 8:
-            _context36.next = 10;
+          case 9:
+            _context36.next = 11;
+            return regeneratorRuntime.awrap(expect(userManagementPage.userCards.first()).toBeVisible({
+              timeout: 30000
+            }));
+
+          case 11:
+            _context36.next = 13;
             return regeneratorRuntime.awrap(userManagementPage.getUserCount());
 
-          case 10:
+          case 13:
             afterRefreshCount = _context36.sent;
             expect(afterRefreshCount).toBe(initialCount);
 
-          case 12:
+          case 15:
           case "end":
             return _context36.stop();
         }
